@@ -26,11 +26,7 @@ public class MyCourse extends Controller{
     public static void courseForm() {
     	render();
     }
-    public static void myOwnCourses() {
-    	User user = (User)renderArgs.get("user");
-    	List<Course> myCourses = Course.getMyOwnCourses(user);
-    	render(myCourses);
-    }
+    
     public static void userPhoto(long id) {
     	   final Course course = Course.findById(id);
     	   notFoundIfNull(course);    	   

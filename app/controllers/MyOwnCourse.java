@@ -24,12 +24,6 @@ public class MyOwnCourse extends Controller{
     public static void courseForm() {
     	render();
     }
-    public static void myOwnCourses() {
-    	User user = (User)renderArgs.get("user");
-    	List<Course> myCourses = Course.getMyOwnCourses(user);
-    	render(myCourses);
-    }
-    
     public static void checkCourse(long courseId) {
     	User user = (User)renderArgs.get("user");
     	
@@ -147,6 +141,11 @@ public class MyOwnCourse extends Controller{
     		Cache.set("course_"+courseId, course,"30mn");
     	}
     	render(courseId,course);
+    }
+    public static void myOwnCourses() {
+    	User user = (User)renderArgs.get("user");
+    	List<Course> myCourses = Course.getMyOwnCourses(user);
+    	render(myCourses);
     }
     public static void editResourses(long courseId,String resources){    	
     	Course course = Course.getCourseById(courseId); 

@@ -63,7 +63,11 @@ public class User extends Model implements Serializable{
 		this.aboutMe = aboutMe;
 	}
 
-
+	public User(String email, String pwd,Blob avatar) {
+		this.avatar = avatar;
+		this.email = email;
+		this.pwd = pwd; 
+	}
 	public User(String email, String pwd) {
 		this.email = email;
 		this.pwd = pwd; 

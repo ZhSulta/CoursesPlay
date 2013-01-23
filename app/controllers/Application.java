@@ -101,6 +101,10 @@ public class Application extends Controller {
     }
     public static void profile() {
     	User user = Cache.get(session.getId() + "-user",User.class);
+    	if(user==null){
+    		user = User.getUserByEmail(session.get("email"));
+    		Cache.set(session.getId() + "-user", user, "30mn");
+    	}
     	List<models.MyCourse> myCourses = models.MyCourse.getMyCoursesByUser(user);
     	List<Course> myOwnCourses = Course.getMyOwnCourses(user);
     	List<Question> questions = Question.getUserQuestions(user);
@@ -135,7 +139,7 @@ public class Application extends Controller {
 //    		Cache.set(session.getId() + "-user", user, "30mn");
 //    	}    	
     	User user = User.getUserByEmail(session.get("email"));
-    	System.out.println(user);
+    	System.out.println(avatar);
     	SimpleDateFormat dateFormat = new SimpleDateFormat("dd-mm-yyyy"); 
     	Date convertedDate = null;
 		try {
@@ -144,6 +148,9 @@ public class Application extends Controller {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+//		User user1 = new User(user.email, user.pwd,avatar);
+//		user1.save();
+		
     	user.username = username;
     	user.firstName = firstName;
     	user.lastName = lastName;

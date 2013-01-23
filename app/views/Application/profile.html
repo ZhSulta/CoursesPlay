@@ -8,6 +8,7 @@
 <div class="container">   
 	<div class="row">
 		<div class="span8">
+		<img src="@{Application.userPhoto(user.id)}" style="width: 120px; height: 120px;'">
 		<!-- 
 		#{gravatar.img 'zh.sulta@gmail.com', size:140, default:'mm', rating:'pg', secure:true/}
 		 -->
@@ -43,7 +44,7 @@
 			    </div>
 			    <div class="tab-pane" id="tab2">
 			    	#{list items:myOwnCourses, as:'i'}
-						${i.name}
+			    		<h3><a href="@{MyOwnCourse.myOwnCourse(i.id)}">${i.name}</a></h3>						
 					#{/list}
 			    </div>
 			    <div class="tab-pane" id="tab3">
