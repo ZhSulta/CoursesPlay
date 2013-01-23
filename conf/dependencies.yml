@@ -1,0 +1,6 @@
+# Application dependencies
+
+require:
+    - play -> crud
+    - play -> gravatar 1.0.2
+    #- play -> securesocial 0.2.5

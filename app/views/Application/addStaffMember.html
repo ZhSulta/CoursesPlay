@@ -1,0 +1,43 @@
+#{form @Staff.create(), id:'staffForm', enctype:'multipart/form-data' }
+	<input type="hidden" name="x1" value="" />
+  	<input type="hidden" name="y1" value="" />
+  	<input type="hidden" name="x2" value="" />
+  	<input type="hidden" name="y2" value="" />
+	<input type="hidden" name="origWidth" value="" />
+	<input type="hidden" name="origHeight" value="" />
+	<input type="hidden" name="finalWidthAndHeight" value="200" />
+
+        <!-- this is styled with twitter bootstrap -->
+
+	<fieldset>
+ 
+		<legend>Add a staff member</legend>
+		<br/>
+		
+		first name
+		...
+
+		<div class="clearfix">
+			<label for="avatarFile">Avatar</label>
+			<div class="input">
+				<input id="avatarFile" type="file" name="avatarFile" class="input-file" />
+				<span class="help-inline"></span>	
+			</div>
+		</div>
+                <div id="avatar" class="clearfix" style="display:none">
+			<label for="avatarPreviewImage">Preview</label>
+			<div class="avatar-preview">
+				<a id="avatarHref" href="" rel="lightbox">
+					<img id="avatarPreviewImage" src="" style="border: none;" />
+				</a>	
+			</div>
+		</div>
+
+		
+		<div class="actions">
+			<input class="btn primary" type="submit" value="Save">
+			<a class="btn" href="@{Staff.index(practice.id)}">Cancel</a>
+		</div>
+
+	</fieldset>
+#{/form}
