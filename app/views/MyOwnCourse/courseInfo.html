@@ -16,14 +16,44 @@
 					${a.text}
 				#{/verbatim}
 				<div class="pull-right">&{a.date}</div>
+				#{if course.user.email == session.email}
 				<br/>				
 				<a data-toggle="modal" href="#myModal">Edit</a>
 				<!-- 
 				<a  href="javascript:deleteConf(${courseId},${a.id})">Delete</a>
 				 -->				
-				<a  href="@{MyOwnCourse.deleteCourseInfo(courseId,a.id)}">Delete</a>
+				<a  href="@{MyOwnCourse.deleteCourseInfo(course.id,a.id)}">Delete</a>
+				#{/if}
 				<hr />
 			#{/list}
+			#{if course.user.email == session.email}
+			<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+		          <div class="modal-header">
+		          	<a class="close" data-dismiss="modal">×</a>
+		            	<h3 id="myModalLabel">Edit information</h3>
+		          </div>
+				#{form @MyOwnCourse.addCourseInfo(a?.id)}
+					<div class="modal-body">                 	
+			           	<div class="control-group">
+					    	<label class="control-label" for="topic">Topic</label>
+					    	<div class="controls">
+					      		<input type="text" id="topic" name="topic" value="${a?.topic}" >
+					   		</div>
+					  	</div>
+					  	<div class="control-group">
+					    	<label class="control-label" for="topic">Text</label>
+					    	<div class="controls">
+					      		<textarea name="courseInfo" style="width: 500px;">${a?.text}</textarea>
+					   		</div>
+					  	</div>						  	
+						<input type="hidden" name="courseId" value="&{course.id}">            		                 						   				
+					</div>
+			        <div class="modal-footer">
+			           	<button class="btn" data-dismiss="modal">Close</button>
+			           	<button type="submit" class="btn btn-primary">Edit Information</button>
+					</div>	    	
+				#{/form}
+			</div> 
 			<script type="text/javascript" src="@{'/public/javascripts/nicEdit.js'}"></script>
 			<script type="text/javascript">
 				bkLib.onDomLoaded(function() { nicEditors.allTextAreas() });
@@ -35,40 +65,15 @@
 		      		<input type="text" id="topic" name="topic" placeholder="Write topic of the information">
 		   		</div>
 				<textarea name="courseInfo" style="width: 100%;" ></textarea>			
-				<input type="hidden" name="courseId" value="&{courseId}"> 
+				<input type="hidden" name="courseId" value="&{course.id}"> 
 				<button type="submit" class="btn btn-primary">Add Information</button>							
 			</form>
+			#{/if}
 		</div>
 	</div>					
 </div>
 
-<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
-          <div class="modal-header">
-          	<a class="close" data-dismiss="modal">×</a>
-            	<h3 id="myModalLabel">Edit information</h3>
-          </div>
-	#{form @MyOwnCourse.addCourseInfo(a?.id)}
-		<div class="modal-body">                 	
-           	<div class="control-group">
-		    	<label class="control-label" for="topic">Topic</label>
-		    	<div class="controls">
-		      		<input type="text" id="topic" name="topic" value="${a?.topic}" >
-		   		</div>
-		  	</div>
-		  	<div class="control-group">
-		    	<label class="control-label" for="topic">Text</label>
-		    	<div class="controls">
-		      		<textarea name="courseInfo" style="width: 500px;">${a?.text}</textarea>
-		   		</div>
-		  	</div>						  	
-			<input type="hidden" name="courseId" value="&{courseId}">            		                 						   				
-		</div>
-        	<div class="modal-footer">
-           	<button class="btn" data-dismiss="modal">Close</button>
-           	<button type="submit" class="btn btn-primary">Edit Information</button>
-		</div>	    	
-	#{/form}
-</div> 
+
 
 
 
@@ -84,7 +89,7 @@
 		// window.location="@{MyOwnCourse.deleteCourseInfo(courseId,announcementId)}";
 		 var postURL = #{jsAction @MyOwnCourse.deleteCourseInfo() /}
 		 $.post(postURL(), { courseId: courseId, announcementId: announcementId} );
-		 window.location="@{MyOwnCourse.courseInfo(courseId)}";
+		 window.location="@{MyOwnCourse.courseInfo(course.id)}";
 	   }	
  }
     function strip(html)

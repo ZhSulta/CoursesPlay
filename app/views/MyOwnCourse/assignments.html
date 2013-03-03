@@ -1,0 +1,150 @@
+#{extends 'mainOwnCourse.html' /}
+#{set title:'Home' /}
+    <style type="text/css">
+      .span4 {
+        padding-top: 20px;        
+      }
+    </style>	
+    <link href="@{'/public/stylesheets/datepicker.css'}" rel="stylesheet" />
+<div class="container">   
+	<div class="row">
+	
+	
+	
+	
+	
+	
+	
+	<div class="span3 bs-docs-sidebar">
+        <div class="accordion" id="my_accordion">
+        	#{list items:topics, as:'t'}
+	            <div class="accordion-group">
+			        <div class="accordion-heading">
+			            <h4>
+			            	<a class="accordion-toggle" data-parent="#my_accordion" data-toggle="collapse" href="#collapse_${t}">${t}<span class="pull-right">+</span></a>
+			            </h4>
+			        </div>
+	                <div class="accordion-body collapse" id="collapse_${t}">
+			            <div class="accordion-inner">
+				            #{list items:assignments, as:'a'}
+				                #{if a.topic.equals(t)}							
+					                <li>
+							          	<a href="@{MyOwnCourse.assignment(course.id,a.id)}">${a.title}</a>
+						          	</li>
+				          		#{/if}
+				        	#{/list} 
+			            </div>
+			        </div>
+				</div>
+			#{/list}
+		</div>
+		#{if course.user.email == session.email}	
+          <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+            <div class="modal-header">
+            	<a class="close" data-dismiss="modal">×</a>
+              <h3 id="myModalLabel">New Assignment</h3>
+            </div>
+             <form action="@{MyOwnCourse.addAssignment()}" class="form-horizontal">
+	         	<div class="modal-body">                 	
+	            	<div class="control-group">
+				    	<label class="control-label" for="topic">Topic</label>
+				    	<div class="controls">
+				      		<input type="text" id="topic" name="topic" placeholder="Write same topic or new topic">
+				   		</div>
+				  	</div>
+				  	<div class="control-group">
+				    	<label class="control-label" for="title">Title</label>
+				    	<div class="controls">
+				      		<input type="text" id="title" name="title" placeholder="Write assingment title">
+				   		</div>
+				  	</div>
+               		<div class="control-group">
+				    	<label class="control-label" for="attempts">Attempts</label>
+				    	<div class="controls">
+				      		<input type="text" id="attempts" name="attempts" placeholder="Number of attempts">
+				   		</div>
+				  	</div>
+				  	<div class="control-group">
+			            <label class="control-label" for="dp3">Due date</label>
+			            <div class="controls">
+			              <div class="input-append date" id="dp3" data-date="%{out.print(new Date());}%" data-date-format="dd-mm-yyyy">
+							<input class="span2" size="16" value="${due_date}" type="text" name="due_date" readonly>
+							<span class="add-on"><i class="icon-calendar"></i></span>
+						  </div>		              
+			            </div>
+			        </div>
+				  	<input type="hidden" name="courseId" value="&{course.id}">            		                 						   				
+				</div>
+	            <div class="modal-footer">
+	            	<button class="btn" data-dismiss="modal">Close</button>
+	            	<button type="submit" class="btn btn-primary">Add Assignment</button>
+	            </div>	    	
+            </form>
+        </div>   
+         
+          <div id="homeworkModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+            <div class="modal-header">
+            	<a class="close" data-dismiss="modal">×</a>
+              <h3 id="myModalLabel">New Homework</h3>
+            </div>
+             <form action="@{MyOwnCourse.addAssignment()}" class="form-horizontal">
+	         	<div class="modal-body">                 	
+	            	<div class="control-group">
+				    	<label class="control-label" for="topic">Topic</label>
+				    	<div class="controls">
+				      		<input type="text" id="topic" name="topic" placeholder="Write same topic or new topic">
+				   		</div>
+				  	</div>
+				  	<div class="control-group">
+				    	<label class="control-label" for="title">Title</label>
+				    	<div class="controls">
+				      		<input type="text" id="title" name="title" placeholder="Write assingment title">
+				   		</div>
+				  	</div>
+               		<div class="control-group">
+				    	<label class="control-label" for="attempts">Attempts</label>
+				    	<div class="controls">
+				      		<input type="text" id="attempts" name="attempts" placeholder="Number of attempts">
+				   		</div>
+				  	</div>
+				  	<div class="control-group">
+			            <label class="control-label" for="dp3">Due date</label>
+			            <div class="controls">
+			              <div class="input-append date" id="dp3" data-date="%{out.print(new Date());}%" data-date-format="dd-mm-yyyy">
+							<input class="span2" size="16" value="${due_date}" type="text" name="due_date" readonly>
+							<span class="add-on"><i class="icon-calendar"></i></span>
+						  </div>		              
+			            </div>
+			        </div>
+				  	<input type="hidden" name="courseId" value="&{course.id}">            		                 						   				
+				</div>
+	            <div class="modal-footer">
+	            	<button class="btn" data-dismiss="modal">Close</button>
+	            	<button type="submit" class="btn btn-primary">Add Assignment</button>
+	            </div>	    	
+            </form>
+        </div>      	   
+        <a class="btn btn-primary" data-toggle="modal" href="#myModal" type="button">Add Assignment</a>
+        <a class="btn btn-primary" data-toggle="modal" href="#homeworkModal" type="button">Add Homework</a>                
+      	#{/if}
+      </div>
+	</div>					
+</div>
+
+#{set 'moreScripts'}
+<script src="@{'/public/javascripts/bootstrap-datepicker.js'}"></script>
+<script>
+
+$(function(){	
+	$(".accordion-body").on("show",function(event){
+        $('span', $(this).prev()).text('-');
+	});
+	$(".accordion-body").on("hide",function(event){
+	        $('span', $(this).prev()).text('+');
+	});
+	
+	window.prettyPrint && prettyPrint();
+	$('#dp3').datepicker();	   
+});		
+    </script>
+#{/set}

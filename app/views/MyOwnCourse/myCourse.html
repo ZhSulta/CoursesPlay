@@ -4,104 +4,32 @@
       .span4 {
         padding-top: 20px;        
       }
+      
     </style>	
+
 <div class="container">   
-		  	<div class="row">
+	<div class="row">
+	<h3>${course.name}</h3>
       <div class="span3 bs-docs-sidebar">
         <ul class="nav nav-list bs-docs-sidenav">
-          <li><a href="#dropdowns"><i class="icon-chevron-right"></i> Dropdowns</a></li>
-          <li><a href="#buttonGroups"><i class="icon-chevron-right"></i> Button groups</a></li>
-          <li><a href="#buttonDropdowns"><i class="icon-chevron-right"></i> Button dropdowns</a></li>
-          <li><a href="#navs"><i class="icon-chevron-right"></i> Navs</a></li>
-          <li><a href="#navbar"><i class="icon-chevron-right"></i> Navbar</a></li>
-          <li><a href="#breadcrumbs"><i class="icon-chevron-right"></i> Breadcrumbs</a></li>
-          <li><a href="#pagination"><i class="icon-chevron-right"></i> Pagination</a></li>
-          <li><a href="#labels-badges"><i class="icon-chevron-right"></i> Labels and badges</a></li>
-          <li><a href="#typography"><i class="icon-chevron-right"></i> Typography</a></li>
-          <li><a href="#thumbnails"><i class="icon-chevron-right"></i> Thumbnails</a></li>
-          <li><a href="#alerts"><i class="icon-chevron-right"></i> Alerts</a></li>
-          <li><a href="#progress"><i class="icon-chevron-right"></i> Progress bars</a></li>
-          <li><a href="#media"><i class="icon-chevron-right"></i> Media object</a></li>
-          <li><a href="#misc"><i class="icon-chevron-right"></i> Misc</a></li>
-        </ul>
+          #{list items:videos, as:'v'}	
+          	<li><a href="@{MyOwnCourse.myOwnCourse(courseId,v.id)}">&{v.name}</a></li> 
+          #{/list}                	   
+        </ul>                
       </div>
-        <div class="span9">
+        <div class="span9">        
 			<div class="container-fluid">
-  	    		<div class="row-fluid">
-  	    		<h:form>
-  	    	      
-	  	    		<p:commandLink actionListener="#" value="insert" ajax="false">
-					    <f:attribute name="id" value="as" />
-					</p:commandLink>
-				</h:form>
+  	    		<div class="row-fluid">  	    		
 					<div class="span7">
-						<iframe width="560" height="420" src="http://www.youtube.com/embed/yvWMsD2QyvQ" frameborder="0" allowfullscreen="tru"></iframe>								
+						#{if video}
+							<iframe width="560" height="420" src="${video.url}" frameborder="0" allowfullscreen="tru"></iframe>		          			
+						#{/if}
+						#{else}
+						No video.
+						#{/else}
 					</div>
-					
-					
 				</div>
 			</div>			       
         </div><!--/span-->
-      </div><!--/row-->
-
-	
-	
-	
-	
-	
-	<!-- 
-	<div class="row-fluid">	
-	<ul class="thumbnails">		
-		<section class="highlighted-courses"> 
-			<section class="courses">		
-			#{list items:courses, as:'i'}						
-	 			<li class="span4">	 	 													
-						<article class="course"> 														
-							<div class="inner-wrapper">
-								<h:form>	
-					 				<h:commandLink action="courseBean.aboutCourse}" value="&{i.name}" >		
-					 					<f:param name="course_id" value="i.course_id}" />	
-					 					<header class="course-preview">					 					
-					 					<div class="info-link">➔</div> </header> 	    					 
-					 				</h:commandLink>   													 				 
-								</h:form> 		 
-								
-								<a href="#"> 
-									<hea	der class="course-preview"> 
-									<hgroup> <h2> i.name</h2> </hgroup>
-									<div class="info-link">➔</div> </header> 
-								</a>
-								<section class="info">
-									<a href="#"> 
-										<div class="cover-image"> 
-											<img src="./static/img/course_image.1b653ea8b15b.jpg" /> 
-										</div> 
-										<div class="desc"> 
-											<p>
-											#{if i.smallDescription}
-												&{i.smallDescription}
-											#{/if}
-						                  	#{else}
-						                  		<h3>No Description</h3>
-						                  	#{/else} 
-											</p> 
-										</div> 
-									</a>
-									<div class="bottom">												
-										<a href="#" class="university">i.university</a> 
-										<span class="start-date">i.startDate</span> 
-									</div> 
-								</section>
-							</div> 
-							<div class="meta-info"> 
-								<p class="university">i.university</p> 
-							</div>  
-						</article> 						
-					</li>				
-			#{/list}
-			</section>
-		</section>
-		</ul>
-	</div>  
--->		 							
+      </div><!--/row-->			
 </div>

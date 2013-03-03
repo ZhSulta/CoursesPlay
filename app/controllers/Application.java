@@ -25,40 +25,46 @@ public class Application extends Controller {
 	public static void index() {
 //		Mails.welcome();
 		System.out.println(Security.isConnected());
-		List<Course> myCourses = null;
+		List<Course> myCourses = new ArrayList<Course>();
+		User user = null;
 		if(Security.isConnected()) {
-			User user = Cache.get(session.getId() + "-user",User.class);
+			user = Cache.get(session.getId() + "-user",User.class);
         	if(user==null){
         		user = User.getUserByEmail(session.get("email"));
         		Cache.set(session.getId() + "-user", user, "30mn");
         	}
         	myCourses = Course.getMyOwnCourses(user);
-        }		
+        }
 		
-		List<Course> courses = Course.all().fetch();		
-        render(courses,myCourses);
+		for(int i=0;i<myCourses.size();i++){
+			System.out.println(myCourses.get(i));
+		}
+		List<Course> universityCourses = Course.getUniversityCourses(user);		
+		List<Course> userCourses = Course.getUserCourses(user);
+		
+		render(universityCourses,userCourses,user);
     }
-//    public static void login() {    	
-//        render();
-//    }
-//    public static void authenticate(@Required(message="Email is required") String email, 
-//    		@Required(message="Password is required") String pwd,
-//        		boolean remember) throws Throwable {
-//    
-//    	System.out.println("authenticate");
-//    	Secure.authenticate(email,pwd,remember);
-//    	if(Security.isConnected()) {
-//    		System.out.println("connected");
-//        }
-////    	boolean auth = Security.authenticate(email,pwd);
-////    	System.out.println("auth "+auth);
-////    	index();
-//    }
-        
+	public static void manageCourses() {
+		List<Course> activeCourses = Course.getActiveCourses();
+		List<Course> notActiveCourses = Course.getNotActiveCourses();
+		List<Course> allCourses = Course.findAll();		
+		User user = Cache.get(session.getId() + "-user",User.class);
+    	if(user==null){
+    		user = User.getUserByEmail(session.get("email"));
+    		Cache.set(session.getId() + "-user", user, "30mn");
+    	}
+    	render(activeCourses,notActiveCourses,allCourses,user);
+    }   
     public static void signup() {    	
     	render();
+    } 
+    public static void coursePhoto(long id) {
+    	   final Course course = Course.findById(id);
+    	   notFoundIfNull(course);    	   
+    	   System.out.println(id+"a111111111111");
+    	   response.setContentTypeIfNotSet(course.photo.type());
+    	   renderBinary(course.photo.get());
     }
-    
     public static void save(Long id,
     		@Required(message="Email is required") String email, 
     		@Required(message="Password is required") String pwd, 

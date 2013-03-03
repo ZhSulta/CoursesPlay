@@ -35,6 +35,7 @@ public class User extends Model implements Serializable{
 	public Date birthday;
 	public String aboutMe;
     public boolean isAdmin;
+    public boolean isTeacher;
     
 	@OneToMany(mappedBy="user", cascade=CascadeType.ALL)
 	public Set<MyCourse> myCourses;
@@ -46,7 +47,8 @@ public class User extends Model implements Serializable{
 	public Set<Answer> answers;
 	@OneToMany(mappedBy="user", cascade=CascadeType.ALL)
 	public Set<Comment> comments;
-	
+	@OneToMany(mappedBy="user", cascade=CascadeType.ALL)
+	public Set<UserAssignment> userAssignments;
 	
 	public User(String username, String pwd, String email, String firstName,
 			String lastName, String gender, String location, Blob avatar,

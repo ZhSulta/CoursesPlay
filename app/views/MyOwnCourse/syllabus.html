@@ -16,17 +16,19 @@
 				${course.syllabus}
 				#{/verbatim}
 				</p>						
-				<hr />			
-			<script type="text/javascript" src="@{'/public/javascripts/nicEdit.js'}"></script>
-			<script type="text/javascript">
-				bkLib.onDomLoaded(function() { nicEditors.allTextAreas() });
-			</script>	
-			<h3>Edit syllabus.</h3>
-			<form action="@{MyOwnCourse.editSyllabus()}" class="form-horizontal" method="post">				    	
-				<textarea name="syllabus" style="width: 100%;" >${course.syllabus}</textarea>		
-				<input type="hidden" name="courseId" value="&{courseId}"> 					
-				<button type="submit" class="btn btn-primary">Edit syllabus</button>							
-			</form>
+				<hr />
+				#{if course.user.email == session.email}			
+					<script type="text/javascript" src="@{'/public/javascripts/nicEdit.js'}"></script>
+					<script type="text/javascript">
+						bkLib.onDomLoaded(function() { nicEditors.allTextAreas() });
+					</script>	
+					<h3>Edit syllabus.</h3>
+					<form action="@{MyOwnCourse.editSyllabus()}" class="form-horizontal" method="post">				    	
+						<textarea name="syllabus" style="width: 100%;" >${course.syllabus}</textarea>		
+						<input type="hidden" name="courseId" value="&{course.id}"> 					
+						<button type="submit" class="btn btn-primary">Edit syllabus</button>							
+					</form>
+				#{/if}
 		</div>
 	</div>					
 </div> 

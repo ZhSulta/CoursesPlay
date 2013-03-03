@@ -94,8 +94,11 @@
       <div class="span3 bs-docs-sidebar">
         <ul class="nav nav-list bs-docs-sidenav">
           #{list items:videos, as:'v'}	
-          	<li><a href="@{MyOwnCourse.myOwnCourse(courseId,v.url)}">&{v.name}</a></li> 
+          	<li>
+	          	<a href="@{MyOwnCourse.myOwnCourse(course.id,v.id)}">&{v.name}</a>
+          	</li> 
           #{/list}
+          #{if course.user.email == session.email}
           <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
             <div class="modal-header">
             	<a class="close" data-dismiss="modal">×</a>
@@ -121,7 +124,7 @@
 				      		<input type="text" id="inputUrl" name="url" placeholder="Write url address of a video">
 				   		</div>
 				  	</div>   
-				  	<input type="hidden" name="courseId" value="&{courseId}">            		                 						   				
+				  	<input type="hidden" name="courseId" value="&{course.id}">            		                 						   				
 				</div>
 	            <div class="modal-footer">
 	            	<button class="btn" data-dismiss="modal">Close</button>
@@ -130,14 +133,19 @@
             </form>
         </div>        	   
         </ul> 
-        <a class="btn btn-block" data-toggle="modal" href="#myModal" type="button">New video</a>                
+        <a class="btn btn-block" data-toggle="modal" href="#myModal" type="button">New video</a>
+        #{/if}                
       </div>
         <div class="span9">
-        
 			<div class="container-fluid">
   	    		<div class="row-fluid">  	    		
 					<div class="span7">
-							<iframe width="560" height="420" src="${videoUrl}" frameborder="0" allowfullscreen="tru"></iframe>		          			
+					#{if video}
+						<iframe width="560" height="420" src="${video.url}" frameborder="0" allowfullscreen="tru"></iframe>		          			
+						<a href="@{MyOwnCourse.removeVideo(courseId,video.id)}">
+	          				Remove this video.
+	          			</a>
+	          		#{/if}
 					</div>
 				</div>
 			</div>			       

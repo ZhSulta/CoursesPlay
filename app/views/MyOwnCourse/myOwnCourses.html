@@ -8,11 +8,10 @@
 <div class="container">   
 	<div class="row">
 	#{if myCourses}
-		#{list items:myCourses, as:'i'}	
+		#{list items:myCourses, as:'i'}			
 		<div class="span4">
 			<div class="thumbnail">
-			
-				<a href="@{MyOwnCourse.myOwnCourse(i.id)}"><img src="@{MyCourse.userPhoto(i.id)}"></a>
+				<a href="@{MyOwnCourse.myOwnCourse(i.id)}"><img src="@{Application.coursePhoto(i.id)}" style="width: 370px; height: 160px;"></a>
 				<div class="caption">
 					#{if i.isActive}
 						Course is active
@@ -36,7 +35,7 @@
 	#{/if}	
 	#{else}
 		<h3>You haven't got any courses</h3>
-		<a href="@{MyCourse.courseForm()}">Create your own course</a>
+		<a href="@{MyOwnCourse.courseForm()}">Create your own course</a>
 	#{/else}
 	</div>					
 </div>

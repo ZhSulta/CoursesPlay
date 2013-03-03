@@ -115,17 +115,19 @@ width: 32px;
 							        asked
 							        <strong>${question.publish_date.format('dd MMM hh:mm:ss')}</strong>
 							    </p>
-							    <img class="gravatar" width="32" height="32" src="https://secure.gravatar.com/avatar/0febcd835cb82aa9fe31f13ce7623196?s=32&amp;d=monsterid&amp;r=g" alt="Zaven%20Muradyan-1's gravatar image" />
+							    <img src="@{Application.userPhoto(question.user.id)}" width="32" height="32">				      	
 							    <p>
-								    <a href="/users/100044898/zaven-muradyan-1">
 								    #{if question.user.username && question.user.username.length()>0}
 					            		${question.user.username}
 					            	#{/if}
 					            	#{else}
 					            		${question.user.email}
-					            	#{/else}	
-					            	</a>
+					            	#{/else}						            	
 							    </p>
+							    <br/>
+							    #{if session.email.equals(question.user.email)}
+							    	<a href="@{MyOwnCourse.deleteQuestion(courseId,question.id)}">Delete</a>
+							    #{/if}
 							</div>
 							<div class="clear"></div>
 						</div>
@@ -161,26 +163,27 @@ width: 32px;
          							</div>
                                     <div class="post-update-info-container">
                                         <div class='post-update-info post-update-info-user'>
-							    <p style="line-height:12px;">
-							        answered
-							        <strong>${a.publish_date.format('dd MMM hh:mm:ss')}</strong>
-							    </p>
-							    <img class="gravatar" width="32" height="32" src="https://secure.gravatar.com/avatar/c056632fe47c504d7092afc1de04ee76?s=32&amp;d=monsterid&amp;r=g" alt="Bartolomeo's gravatar image" />
-							    <p>
-								    <a href="/users/100010407/bartolomeo">
-								    	#{if a.user.username && a.user.username.length()>0}
-						            		${a.user.username}
-						            	#{/if}
-						            	#{else}
-						            		${a.user.email}
-						            	#{/else}
-								    </a>
-								    <br/>
-								    <br/>
-							    </p>
-							</div>
-						</div>
-						<div class="clear"></div>
+										    <p style="line-height:12px;">
+										        answered
+										        <strong>${a.publish_date.format('dd MMM hh:mm:ss')}</strong>
+										    </p>
+										    <img src="@{Application.userPhoto(a.user.id)}" width="32" height="32">				      	
+										    <p>
+										    	#{if a.user.username && a.user.username.length()>0}
+								            		${a.user.username}
+								            	#{/if}
+								            	#{else}
+								            		${a.user.email}
+								            	#{/else}
+											    <br/>
+											    <br/>								    						            
+										    </p>
+										    #{if session.email.equals(a.user.email)}
+										    	<a href="@{MyOwnCourse.deleteAnswer(courseId,question.id,a.id)}">Delete</a>
+										    #{/if}										        										    										
+										</div>
+									</div>
+									<div class="clear"></div>
                                 </div>
                             </td>
                         </tr>
@@ -202,7 +205,7 @@ width: 32px;
 					   		</div>
 					  	</div>						  	
 						<input type="hidden" name="courseId" value="${courseId}">
-						<input type="hidden" name="questionId" value="${questionId}">            		                 						   							
+						<input type="hidden" name="questionId" value="${question.id}">            		                 						   							
 			        <button type="submit" class="btn btn-success">Post Your Answer</button>			
 				#{/form}
 			</div>

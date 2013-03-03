@@ -8,8 +8,18 @@
 <div class="container">   
 	<div class="row">
 		<diV class="span9">	
-			#{list items:myCourses, as:'i'}
-				<table class="table table-striped table-bordered table-hover">
+			<div class="tabbable"> <!-- Only required for left/right tabs -->
+			  <ul class="nav nav-tabs">
+			    <li class="active">
+			    	<a href="#tab1" data-toggle="tab">User progress</a>
+			    </li>
+			    <li>
+			    	<a href="#tab2" data-toggle="tab">Task progress</a>
+			    </li>
+			  </ul>
+			  <div class="tab-content">
+			    <div class="tab-pane active" id="tab1">
+					<table class="table table-striped table-bordered table-hover">
 					<thead>
 					    <tr>
 						      <th>Username/Email</th>
@@ -17,6 +27,7 @@
 					    </tr>
 					</thead>
 				  	<tbody>
+				  		#{list items:course.myCourses, as:'i'}
 				    	<tr>
 					      	<td>
 						    	#{if i.user.username && i.user.username.length()>0}
@@ -43,9 +54,71 @@
 								</div>
 					      	</td>
 				    	</tr>
+				    	#{/list}
 				  	</tbody>
-				</table>				
-			#{/list}
+				</table>	
+			    </div>
+			    <div class="tab-pane" id="tab2">
+			    	<table class="table table-striped table-bordered table-hover">
+					<thead>
+					    <tr>
+						      <th>Assignment/Homework</th>
+						      <th>Number of accepted</th>
+					    </tr>
+					</thead>
+				  	<tbody>
+				  		#{list items:course.assignments, as:'a'}
+				    	<tr>
+					      	<td>
+						      	<div class="accordion" id="my_accordion">
+								    <div class="accordion-group">
+								        <div class="accordion-heading">
+								            <a class="accordion-toggle" data-parent="#my_accordion" data-toggle="collapse" href="#collapse1">
+								            	${a.topic} / ${a.title}	 
+								            <span class="pull-right">+</span></a>
+								        </div>
+								        <div class="accordion-body collapse" id="collapse1">
+								            <div class="accordion-inner">
+								            	<table>
+									            	#{list items:a.userAssignments, as:'u'}								                	
+									                	<tr>
+									                		<td>
+									                			<a href="MyOwnCourse.">${u.user}</a><br/>
+									                		</td>
+									                		<td>
+									                			Score is <b>${u.score}</b>
+									                		</td>
+									                	</tr>									                	
+									                #{/list}
+								                </table>							            									                									                									                								                			             
+								            </div>
+								        </div>
+								    </div>
+								</div>						      
+					      	</td>
+					      	<td>
+					      		${a.attempts}
+					      	</td>
+				    	</tr>
+				    	#{/list}
+				  	</tbody>
+				</table>	
+			    </div>
+			  </div>
+			</div>
 		</div>					
 	</div>
 </div>
+#{set 'moreScripts'}
+<script>
+
+$(function(){	
+	$(".accordion-body").on("show",function(event){
+        $('span', $(this).prev()).text('-');
+	});
+	$(".accordion-body").on("hide",function(event){
+	        $('span', $(this).prev()).text('+');
+	});	   
+});		
+    </script>
+#{/set}

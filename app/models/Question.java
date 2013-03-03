@@ -23,13 +23,16 @@ public class Question extends Model{
 	public String tags;
 	public int votes_number;
 	public int answers_number;
+	public boolean active;
 	public int views_number;
 	public Date publish_date;
-	@OneToMany(mappedBy="question", cascade=CascadeType.ALL)
+	
+	@OneToMany(mappedBy="question", cascade=CascadeType.ALL,fetch = FetchType.EAGER)
 	public Set<Answer> answers;
 	
 	public Question(Course course, User user, String title, String text,
-			String tags) {		
+			String tags) {
+		this.active = true;
 		this.course = course;
 		this.user = user;
 		this.title = title;
@@ -38,10 +41,19 @@ public class Question extends Model{
 		this.votes_number = 0;
 		this.answers_number = 0;
 		this.views_number = 0;
+		this.answers = new HashSet<Answer>();
 		this.publish_date = new Date();
-	}
-	public static List<Question> getCourseQuestions(Course course){
-		 return Question.find("byCourse", course).fetch();		 
+	}	
+	public static List<Question> getCourseQuestions(Course course,String sortBy){
+		if(sortBy.equals("new")){
+			return Question.find("select q from Question q where q.course = :course order by publish_date").setParameter("course", course).fetch();
+		}else if(sortBy.equals("active")){
+			return Question.find("select q from Question q where q.course = :course and active = true order by publish_date").setParameter("course", course).fetch();
+		}else if(sortBy.equals("vote")){
+			return Question.find("select q from Question q where q.course = :course order by votes_number desc").setParameter("course", course).fetch();
+		}
+		return Question.find("select q from Question q where q.course = :course order by :sortBy").setParameter("course", course).setParameter("sortBy", sortBy).fetch();	
+//		 Course.find("select c from Course  where c.user != :user").setParameter("user", user).fetch();
 	}
 	public static List<Question> getUserQuestions(User user){
 		 return Question.find("byUser", user).fetch();		 

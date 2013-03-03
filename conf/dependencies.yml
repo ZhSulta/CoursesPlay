@@ -2,7 +2,8 @@
 
 require:
     - play -> crud
-    - play -> gravatar 1.0.2
-    - play -> openshift 0.2.0-RC1
+    - play -> paginate head
+    #- play -> gravatar 1.0.2
+    #- play -> openshift 0.2.0-RC1
 
     #- play -> securesocial 0.2.5

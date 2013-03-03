@@ -7,12 +7,6 @@
 	    <link href="@{'/public/stylesheets/bootstrap.min.css'}" rel="stylesheet" />
 	    #{get 'moreStyles' /}
         <link rel="shortcut icon" type="image/png" href="@{'/public/images/favicon.png'}">	           
-        <script src="@{'/public/javascripts/jquery-1.7.1.min.js'}"></script>        
-	    <script src="@{'/public/javascripts/bsa(1).js'}"></script>
-	    <script src="@{'/public/javascripts/bootstrap.min.js'}"></script>
-	    <script src="@{'/public/javascripts/application.js'}"></script>
-	    <script src="@{'/public/javascripts/bootswatch.js'}"></script>
-	    #{get 'moreScripts' /}    
     </head>
     <body>
     	   <div class="container-fluid">
@@ -26,13 +20,13 @@
 		       <a class="brand" href="@{Application.index()}">Courses</a>		        
 		       <div class="nav-collapse" id="main-menu">		       
 				<ul class="nav" id="main-menu-left">
-					<li><a href="@{MyOwnCourse.myOwnCourse(courseId)}">Courseware</a></li>										
-					<li><a href="@{MyOwnCourse.courseInfo(courseId)}">Course Info</a></li>
-					<li><a href="@{MyOwnCourse.syllabus(courseId)}">Syllabus</a></li>
-					<li><a href="@{MyOwnCourse.tutorials_resourses(courseId)}">Tutorial & Resourses</a></li>
-					<li><a href="@{MyOwnCourse.wiki(courseId)}">Wiki</a></li>
-					<li><a href="@{MyOwnCourse.discussion(courseId)}">Discussion</a></li>
-					<li><a href="@{MyOwnCourse.progress(courseId)}">Progress</a></li>
+					<li><a href="@{MyOwnCourse.myOwnCourse(course.id)}">Courseware</a></li>										
+					<li><a href="@{MyOwnCourse.courseInfo(course.id)}">Course Info</a></li>
+					<li><a href="@{MyOwnCourse.syllabus(course.id)}">Syllabus</a></li>
+					<li><a href="@{MyOwnCourse.tutorials_resourses(course.id)}">Tutorial & Resourses</a></li>
+					<li><a href="@{MyOwnCourse.assignments(course.id)}">Assignments</a></li>
+					<li><a href="@{MyOwnCourse.discussion(course.id)}">Discussion</a></li>
+					<li><a href="@{MyOwnCourse.progress(course.id)}">Progress</a></li>
 				</ul>
 		        <ul class="nav pull-right">            
 		          <li class="divider-vertical"></li>
@@ -48,7 +42,7 @@
 		              <li><a href="@{Application.profile()}">View my profile</a></li>                
 		              <li><a href="@{Application.editAccount()}">Edit account settings</a></li>
 		              <li><a href="@{Application.help()}">Help</a></li>
-		              <li><a href="@{MyCourse.courseForm()}">Create course</a></li>
+		              <li><a href="@{MyOwnCourse.courseForm()}">Create course</a></li>
 		              <li><a href="@{Secure.logout()}" class="navbar-link">Log out</a></li>
 		            </ul>		            
 		          </li>
@@ -62,5 +56,10 @@
 		   </div>		
 		   </div>       
         #{doLayout /}
+        <script src="@{'/public/javascripts/jquery-1.7.1.min.js'}"></script>        
+	    <script src="@{'/public/javascripts/bootstrap.min.js'}"></script>
+	    <script src="@{'/public/javascripts/application.js'}"></script>
+	    <script src="@{'/public/javascripts/my.js'}"></script>	    
+	    #{get 'moreScripts' /}    
     </body>
 </html>

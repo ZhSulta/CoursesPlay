@@ -15,13 +15,14 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.playframework.playclipse.playNature</nature>
 	</natures>
-	<linkedResources><link><name>gravatar-1.0.2</name><type>2</type><location>/home/sulta/study/play-1.2.5/modules/gravatar-1.0.2/app</location></link>
-<link><name>conf/gravatar-1.0.2</name><type>2</type><location>/home/sulta/study/play-1.2.5/modules/gravatar-1.0.2/conf</location></link>
-<link><name>crud</name><type>2</type><location>/home/sulta/study/play-1.2.5/modules/crud/app</location></link>
-<link><name>conf/crud</name><type>2</type><location>/home/sulta/study/play-1.2.5/modules/crud/conf</location></link>
-<link><name>public/crud</name><type>2</type><location>/home/sulta/study/play-1.2.5/modules/crud/public</location></link>
-<link><name>secure</name><type>2</type><location>/home/sulta/study/play-1.2.5/modules/secure/app</location></link>
-<link><name>conf/secure</name><type>2</type><location>/home/sulta/study/play-1.2.5/modules/secure/conf</location></link>
-<link><name>public/secure</name><type>2</type><location>/home/sulta/study/play-1.2.5/modules/secure/public</location></link>
+	<linkedResources><link><name>paginate-head</name><type>2</type><location>/media/44CC0C36CC0C2530/study/play-1.2.5/modules/paginate-head/app</location></link>
+<link><name>conf/paginate-head</name><type>2</type><location>/media/44CC0C36CC0C2530/study/play-1.2.5/modules/paginate-head/conf</location></link>
+<link><name>public/paginate-head</name><type>2</type><location>/media/44CC0C36CC0C2530/study/play-1.2.5/modules/paginate-head/public</location></link>
+<link><name>crud</name><type>2</type><location>/media/44CC0C36CC0C2530/study/play-1.2.5/modules/crud/app</location></link>
+<link><name>conf/crud</name><type>2</type><location>/media/44CC0C36CC0C2530/study/play-1.2.5/modules/crud/conf</location></link>
+<link><name>public/crud</name><type>2</type><location>/media/44CC0C36CC0C2530/study/play-1.2.5/modules/crud/public</location></link>
+<link><name>secure</name><type>2</type><location>/media/44CC0C36CC0C2530/study/play-1.2.5/modules/secure/app</location></link>
+<link><name>conf/secure</name><type>2</type><location>/media/44CC0C36CC0C2530/study/play-1.2.5/modules/secure/conf</location></link>
+<link><name>public/secure</name><type>2</type><location>/media/44CC0C36CC0C2530/study/play-1.2.5/modules/secure/public</location></link>
 </linkedResources>
 </projectDescription>

@@ -4,7 +4,7 @@
 
 # Home page
 GET     /                                       Application.index
-#GET     /login                                  Application.login
+#GET     /login                                 Application.login
 GET     /signup                                 Application.signup
 GET     /contact                                Application.contact
 GET     /about                                  Application.about

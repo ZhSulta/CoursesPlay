@@ -22,30 +22,29 @@ public class Course extends Model{
 	public String description;
 	public Blob photo;
 	@Lob
-    @Required
 	public String syllabus;
 	@Lob
     public String resources;
-	
+	public String videoUrl;
 	public Date date;
 	public Date startDate;
 	public boolean isActive;
 	@ManyToOne
 	public User user;
-	@OneToMany(mappedBy="course", cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="course", cascade=CascadeType.ALL, fetch = FetchType.EAGER)
 	public Set<Announcement> announcements;
-	@OneToMany(mappedBy="course", cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="course", cascade=CascadeType.ALL, fetch = FetchType.EAGER)
 	public Set<Video> videos;
-	@OneToMany(mappedBy="course", cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="course", cascade=CascadeType.ALL, fetch = FetchType.EAGER)
 	public Set<Question> questions;
-	@OneToMany(mappedBy="course", cascade=CascadeType.ALL)
-	public Set<Wiki> wikies;
-	@OneToMany(mappedBy="course", cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="course", cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	public Set<Assignment> assignments;
+	@OneToMany(mappedBy="course", cascade=CascadeType.ALL, fetch = FetchType.EAGER)
 	public Set<MyCourse> myCourses;
 	
 	public Course(String name, String university, int duration,
 			String smallDescription, String description,
-			Date startDate, User user,String resourses, Blob photo) {
+			Date startDate, User user,String resourses, Blob photo,String videoUrl) {
 		this.name = name;
 		isActive = false;
 		this.university = university;
@@ -54,19 +53,36 @@ public class Course extends Model{
 		this.smallDescription = smallDescription;
 		this.description = description;
 		this.photo = photo;
+		this.videoUrl = videoUrl;
 		this.date = new Date();
 		this.startDate = startDate;
 		this.user = user;
 		this.announcements = new HashSet<Announcement>();
 		this.videos = new HashSet<Video>();
 		this.questions = new HashSet<Question>();
-		this.wikies = new HashSet<Wiki>();
+		this.assignments = new HashSet<Assignment>();
 		this.myCourses = new HashSet<MyCourse>();
 	}
 	public static List<Course> getMyOwnCourses(User user){
 		 List<Course> courses = Course.find("byUser", user).fetch();
 		 return courses;
 	}
+	public static List<Course> getUniversityCourses(User user){
+		 List<Course> courses = Course.find("select c from Course c where c.user != :user and isActive = true").setParameter("user", user).fetch();
+		 return courses;
+	}
+	public static List<Course> getUserCourses(User user){
+		 List<Course> courses = Course.find("select c from Course c where c.user != :user").setParameter("user", user).fetch();
+		 return courses;
+	}
+	public static List<Course> getActiveCourses(){
+		 List<Course> courses = Course.find("byIsActive",true).fetch();
+		 return courses;
+	}
+	public static List<Course> getNotActiveCourses(){
+		 List<Course> courses = Course.find("byIsActive",false).fetch();
+		 return courses;
+	}	
 	public static Course getCourseById(long courseId){
 		 return Course.findById(courseId);	 
 	}
