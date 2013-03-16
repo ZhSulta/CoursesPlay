@@ -57,7 +57,13 @@ public class Application extends Controller {
     }   
     public static void signup() {    	
     	render();
-    } 
+    }
+    public static void code() {    	
+    	render();
+    }
+    public static void jsCode() {    	
+    	render();
+    }
     public static void coursePhoto(long id) {
     	   final Course course = Course.findById(id);
     	   notFoundIfNull(course);    	   

@@ -202,6 +202,17 @@ public class MyOwnCourse extends Controller{
 //    	}
     	render(course,announcements);
     }
+    
+    public static void code(long courseId){
+    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
+    	if(course==null){
+    		course = Course.getCourseById(courseId);    		
+    		Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
+    	}
+    	
+    	render(course);
+    }
+    
     public static void addCourseInfo(Long id,String courseInfo, String topic,long courseId) {
     	System.out.println("id         sd   "+id);
     	Announcement announcement;

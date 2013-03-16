@@ -9,7 +9,9 @@
    
 <div class="container">   
 	<div class="row">	
-		<div class="span9">	
+		<div class="span9">
+			<a href="@{MyOwnCourse.syllabus(course.id)}">Syllabus</a>
+			
 			#{list items:announcements, as:'a'}
 				<h2>${a.topic}</h2>
 				#{verbatim}

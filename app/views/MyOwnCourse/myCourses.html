@@ -11,18 +11,18 @@
 		#{list items:myCourses, as:'i'}	
 		<div class="span4">
 			<div class="thumbnail">
-				<a href="@{MyOwnCourse.myOwnCourse(i.id)}"><img src="@{Application.coursePhoto(i.id)}" style="width: 370px; height: 160px;"></a>
+				<a href="@{MyOwnCourse.myOwnCourse(i.id)}"><img src="@{Application.coursePhoto(i.course.id)}" style="width: 370px; height: 160px;"></a>
 				<div class="caption">
-					#{if i.isActive}
+					#{if i.course.isActive}
 						Course is active
 					#{/if}
 					#{else}
 						Course is not active
 					#{/else}
-					<h3>&{i.name}</h3>
+					<h3>&{i.course.name}</h3>
 					<p>
-					#{if i.smallDescription}
-						&{i.smallDescription}
+					#{if i.course.smallDescription}
+						&{i.course.smallDescription}
 					#{/if}
                   	#{else}
                   		No Description
