@@ -5,6 +5,8 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import controllers.Users;
+
 import play.data.validation.Email;
 import play.data.validation.MaxSize;
 import play.data.validation.MinSize;
@@ -31,11 +33,13 @@ public class User extends Model implements Serializable{
 	public String lastName;
 	public String gender;
 	public String location;
-	public Blob avatar;	
+	public Blob avatar;
+	public String photoFileName;
 	public Date birthday;
 	public String aboutMe;
     public boolean isAdmin;
     public boolean isTeacher;
+    public boolean isActive;
     
 	@OneToMany(mappedBy="user", cascade=CascadeType.ALL)
 	public Set<MyCourse> myCourses;
@@ -63,6 +67,7 @@ public class User extends Model implements Serializable{
 		this.avatar = avatar;
 		this.birthday = birthday;
 		this.aboutMe = aboutMe;
+		this.isActive = false;;
 	}
 
 	public User(String email, String pwd,Blob avatar) {
@@ -84,5 +89,9 @@ public class User extends Model implements Serializable{
 	public static User getUserByEmail(String email) {
 //		System.out.println(email+" 111111111111111email");
 		return find("byEmail", email ).first();
+	}
+	public static List<User> getnotActiveUsersl() {
+//		System.out.println(email+" 111111111111111email");
+		return User.find("byIsActive",false).fetch();
 	}
 }

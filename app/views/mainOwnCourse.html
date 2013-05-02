@@ -5,7 +5,9 @@
         <title>#{get 'title' /}</title>
         <meta charset="${_response_encoding}">     
 	    <link href="@{'/public/stylesheets/bootstrap.min.css'}" rel="stylesheet" />
-	    #{get 'moreStyles' /}
+	    <link rel="stylesheet" href="@{'/public/stylesheets/all_styles.css'}" type="text/css" media="all" />
+        <link href="@{'/public/stylesheets/all_l-sidebar_compas.css'}" rel="stylesheet" />
+        #{get 'moreStyles' /}
         <link rel="shortcut icon" type="image/png" href="@{'/public/images/favicon.png'}">	           
     </head>
     <body>
@@ -19,16 +21,7 @@
 		       </a>
 		       <a class="brand" href="@{Application.index()}">Courses</a>		        
 		       <div class="nav-collapse" id="main-menu">		       
-				<ul class="nav" id="main-menu-left">
-					<li><a href="@{MyOwnCourse.myOwnCourse(course.id)}">Courseware</a></li>										
-					<li><a href="@{MyOwnCourse.courseInfo(course.id)}">Course Info</a></li>
-					<li><a href="@{MyOwnCourse.code(course.id)}">Code</a></li>
-					<li><a href="@{MyOwnCourse.tutorials_resourses(course.id)}">Tutorial & Resourses</a></li>
-					<li><a href="@{MyOwnCourse.assignments(course.id)}">Assignments</a></li>
-					<li><a href="@{MyOwnCourse.discussion(course.id)}">Discussion</a></li>
-					<li><a href="@{MyOwnCourse.progress(course.id)}">Progress</a></li>
-				</ul>
-		        <ul class="nav pull-right">            
+				<ul class="nav pull-right">            
 		          <li class="divider-vertical"></li>
 		          #{if session.myCourses}		          
               		<li>

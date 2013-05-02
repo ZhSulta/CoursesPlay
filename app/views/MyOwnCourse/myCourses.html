@@ -11,7 +11,7 @@
 		#{list items:myCourses, as:'i'}	
 		<div class="span4">
 			<div class="thumbnail">
-				<a href="@{MyOwnCourse.myOwnCourse(i.id)}"><img src="@{Application.coursePhoto(i.course.id)}" style="width: 370px; height: 160px;"></a>
+				<a href="@{MyOwnCourse.myOwnCourse(i.course.id)}"><img src="@{Application.coursePhoto(i.course.id)}" style="width: 370px; height: 160px;"></a>
 				<div class="caption">
 					#{if i.course.isActive}
 						Course is active

@@ -1,0 +1,82 @@
+#{extends 'mainOwnCourse.html' /}
+#{set title:'Home' /}
+
+    <style type="text/css">
+      .span4 {
+        padding-top: 20px;        
+      }
+    </style>	
+   
+<div class="container">   
+	<div class="row">	
+	#{leftMenu course:course, isActive:'3' /}
+		<div class="span8">
+			<div class="b-box">
+			<div class="b-box__header"><h3>Lessons</h3></div>
+			<div class="b-box__content">
+				<h2>${lesson?.name}</h2>
+				<p>${lesson?.topic}</p>		
+				<a href="@{MyOwnCourse.downloadLessonFile(lesson.id)}">${lesson.fileName}</a>
+			</div>
+			</div>	
+		</div>
+		<div class="span3">
+		#{if course.user.email == session.email}
+			<p><small><a data-toggle="modal" href="#lessonModal">Edit</a></small></p>
+		#{/if}
+        	<p><small>Modified 3 days ago</small></p>        	
+        	<p>
+	        	<select class="span2" onchange="window.location.href = this.value" style="margin-bottom:0; line-height: 20px; height: 28px; vertical-align: top; width: 100%">
+		            <option value="#">Change lesson</option>
+		            <option value="#" disabled="true">-------------</option>
+		            #{list items:course.lessons, as:'l'}
+		            #{if l.id == lesson.id}
+						<option value="@{MyOwnCourse.textLesson(course.id,l.id)}" disabled="true" >${l.name?l.name:l.topic}</option>
+					#{/if}						
+					#{else}
+						<option value="@{MyOwnCourse.textLesson(course.id,l.id)}" >${l.name?l.name:l.topic}</option>
+					#{/else}
+					#{/list}
+				</select>
+	    	</p>
+    		<p><small><a href="@{MyOwnCourse.lesson(course.id)}" class="grey">Back to lesson list</a></small></p>
+    	</div>
+	</div>					
+</div>
+#{if course.user.email == session.email}
+      <div id="lessonModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+         <div class="modal-header">
+        	<a class="close" data-dismiss="modal">×</a>
+         	<h3 id="myModalLabel">Edit Lesson</h3>
+         </div>
+         <form action="@{MyOwnCourse.editLesson()}" class="form-horizontal">
+      	 <div class="modal-body">                 	
+         	<div class="control-group">
+		    	<label class="control-label" for="topic">Topic</label>
+		    	<div class="controls">
+		      		<input type="text" id="topic" value="${lesson?.topic}" name="topic" placeholder="Write same topic or new topic">
+		   		</div>
+		  	</div>
+		  	<div class="control-group">
+		    	<label class="control-label" for="inputName">Name</label>
+		    	<div class="controls">
+		      		<input type="text" id="inputName" value="${lesson?.name}"  name="name" placeholder="Write name of video">
+		   		</div>
+		  	</div>
+		    <div class="control-group">
+		    	 <label class="control-label" for="file">File</label>
+			      <div class="controls">		
+			      	<input type="file" id="file" name="file" />					      	    
+			      </div>
+		  	</div>   
+		  	<input type="hidden" name="lessonId" value="&{lesson.id}">            		                 						   				
+		  	<input type="hidden" name="courseId" value="&{course.id}">            		                 						   				
+		 </div>
+         <div class="modal-footer">
+         	<button class="btn" data-dismiss="modal">Close</button>
+         	<button type="submit" class="btn btn-primary">Add Video</button>
+         </div>	    	
+        </form>
+    </div>
+
+    #{/if}  

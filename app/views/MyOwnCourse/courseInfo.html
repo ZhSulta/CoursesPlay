@@ -1,16 +1,12 @@
 #{extends 'mainOwnCourse.html' /}
 #{set title:'Home' /}
-
-    <style type="text/css">
-      .span4 {
-        padding-top: 20px;        
-      }
-    </style>	
-   
 <div class="container">   
 	<div class="row">	
-		<div class="span9">
-			<a href="@{MyOwnCourse.syllabus(course.id)}">Syllabus</a>
+		#{leftMenu  course:course, isActive:'1' /}
+		<div class="span8">
+		    <div class="b-box">
+			<div class="b-box__header"><h3>Post an update</h3></div>
+			<div class="b-box__content">
 			
 			#{list items:announcements, as:'a'}
 				<h2>${a.topic}</h2>
@@ -71,6 +67,11 @@
 				<button type="submit" class="btn btn-primary">Add Information</button>							
 			</form>
 			#{/if}
+			</div>
+			</div>
+		</div>
+		<div class="span3">
+			<a href="@{MyOwnCourse.syllabus(course.id)}">Syllabus</a>		
 		</div>
 	</div>					
 </div>

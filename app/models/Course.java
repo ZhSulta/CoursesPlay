@@ -25,6 +25,7 @@ public class Course extends Model{
 	public String syllabus;
 	@Lob
     public String resources;
+	@Lob
 	public String videoUrl;
 	public Date date;
 	public Date startDate;
@@ -35,6 +36,8 @@ public class Course extends Model{
 	public Set<Announcement> announcements;
 	@OneToMany(mappedBy="course", cascade=CascadeType.ALL, fetch = FetchType.EAGER)
 	public Set<Video> videos;
+	@OneToMany(mappedBy="course", cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	public Set<Lesson> lessons;
 	@OneToMany(mappedBy="course", cascade=CascadeType.ALL, fetch = FetchType.EAGER)
 	public Set<Question> questions;
 	@OneToMany(mappedBy="course", cascade=CascadeType.ALL, fetch = FetchType.EAGER)

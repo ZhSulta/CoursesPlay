@@ -6,8 +6,12 @@ import play.data.validation.Required;
 import play.db.jpa.Blob;
 import play.db.jpa.JPABase;
 import play.i18n.Lang;
+import play.libs.MimeTypes;
 import play.mvc.*;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -15,8 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import notifiers.Mails;
-
 import models.*;
+
 import play.*;
  
 
@@ -102,9 +106,23 @@ public class Application extends Controller {
         User user = new User(email,pwd);
         // Save
         user.save();
-//    	Mails.welcome(user);
-    	Secure.login();
+        String address = email;
+        Mails.verifyUser(email, address);    	
+    	Secure.login();    	
+    }
+    public static void verify(String address) {    
     	
+    	ArrayList<User> users = (ArrayList<User>)User.getnotActiveUsersl();
+    	
+    	for(int i=0;i<users.size();i++){
+    		if(address.equals(users.get(i).email)){
+    			users.get(i).isActive = true;
+    			users.get(i).save();
+    			render(address);
+    			break;
+    		}
+    	}
+    	render("errors/404.html");
     }
     public static void changeLanguage(String lang) {    
     	System.out.println(lang);
@@ -142,9 +160,9 @@ public class Application extends Controller {
  	   notFoundIfNull(user);    	   
  	   response.setContentTypeIfNotSet(user.avatar.type());
  	   renderBinary(user.avatar.get());
- }
+    }
     public static void saveProfile(String username,String firstName, String lastName,String gender,
-    		String birthday,String location, String aboutMe, Blob avatar) {
+    		String birthday,String location, String aboutMe, File avatar) throws FileNotFoundException {
 //    	User user = Cache.get(session.getId() + "-user",User.class);
 //    	if(user==null){
 //    		user = User.getUserByEmail(session.get("email"));
@@ -160,17 +178,20 @@ public class Application extends Controller {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		//System.out.println(avatar);
 //		User user1 = new User(user.email, user.pwd,avatar);
 //		user1.save();
 		
     	user.username = username;
+    	user.photoFileName = avatar.getName();
     	user.firstName = firstName;
     	user.lastName = lastName;
     	user.gender = gender;
     	user.birthday = convertedDate;
     	user.location = location;
     	user.aboutMe = aboutMe;
-    	user.avatar = avatar;
+    	user.avatar = new Blob();
+    	user.avatar.set(new FileInputStream(avatar), MimeTypes.getContentType(avatar.getName()));
     	user.save();    	
     	editAccount();
     }

@@ -44,11 +44,11 @@ public class Question extends Model{
 		this.answers = new HashSet<Answer>();
 		this.publish_date = new Date();
 	}	
-	public static List<Question> getCourseQuestions(Course course,String sortBy){
+	public static List<Question> getCourseQuestions(Course course,String sortBy,int currentPage, int perPage){
 		if(sortBy.equals("new")){
-			return Question.find("select q from Question q where q.course = :course order by publish_date").setParameter("course", course).fetch();
+			return Question.find("select q from Question q where q.course = :course order by publish_date").setParameter("course", course).fetch(currentPage - 1, perPage);
 		}else if(sortBy.equals("active")){
-			return Question.find("select q from Question q where q.course = :course and active = true order by publish_date").setParameter("course", course).fetch();
+			return Question.find("select q from Question q where q.course = :course and active = true order by publish_date").setParameter("course", course).fetch(currentPage, perPage);
 		}else if(sortBy.equals("vote")){
 			return Question.find("select q from Question q where q.course = :course order by votes_number desc").setParameter("course", course).fetch();
 		}

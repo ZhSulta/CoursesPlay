@@ -3,17 +3,21 @@ package controllers;
 import play.*;
 import play.cache.Cache;
 import play.db.jpa.Blob;
+import play.db.jpa.GenericModel;
+import play.libs.MimeTypes;
 import play.modules.paginate.ValuePaginator;
 import play.mvc.*;
+import utils.PaginationInfo;
  
+import java.io.File;
+import java.io.FileInputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 import notifiers.Mails;
- 
-import models.*;
 
+import models.*;
 @With(Secure.class)
 public class MyOwnCourse extends Controller{
 	@Before
@@ -32,7 +36,7 @@ public class MyOwnCourse extends Controller{
     }
     public static void checkCourse(long courseId) {
 //    	User user = (User)renderArgs.get("user");
-//    	
+//    	c
 //    	List<Course> myCourses = Course.getMyOwnCourses(user);
 ////    	System.out.println(myCourses.size());
 //    	for(int i=0;i<myCourses.size();i++){    		
@@ -97,6 +101,7 @@ public class MyOwnCourse extends Controller{
     		course = Course.getCourseById(courseId);    		
     		Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
     	}
+    	courseInfo(courseId);
     	ArrayList<Video> videos = (ArrayList<Video>) Video.getMyOwnVideos(course);
     	Video video = null;
     	if(videoId == 0){
@@ -141,6 +146,28 @@ public class MyOwnCourse extends Controller{
     	Mails.correctCourse(email,username);
     	Application.manageCourses();
     }
+    public static void editCourse(Long Id,String courseName,String smallDescription,
+    		String description,String university,
+    		int duration, Blob photo,String videoUrl) {
+    	System.out.println(Id+" course id ");
+    	System.out.println(videoUrl.indexOf("watch"));
+    	if(videoUrl.contains("watch")){
+    		videoUrl = videoUrl.substring(0,videoUrl.indexOf("watch"))+"embed/"+videoUrl.substring(videoUrl.indexOf("=")+1);
+    		videoUrl+="?autoplay=0&amp;color=red&amp;html5=1&amp;rel=0&amp;showinfo=0&amp;theme=light&amp;wmode=opaque&amp;enablejsapi=1&amp;";    	
+        }
+    	Course course = Course.getCourseById(Id);
+    	course.name = courseName;
+    	System.out.println(courseName+"111111111111");
+    	course.smallDescription = smallDescription;
+    	course.description = description;
+    	course.university = university;
+    	course.duration = duration;
+    	course.photo = photo;    	
+//    	course.videoUrl = videoUrl;
+    	course.save();
+    	Cache.set(session.getId() + "_user-course_"+Id, course,"30mn");
+    	MyOwnCourse.courseSettings(Id);
+    }
     public static void createCourse(String courseName,String smallDescription,String description,String university,
     		int duration, Blob photo,String videoUrl) {
     	System.out.println(videoUrl.indexOf("watch"));
@@ -158,7 +185,8 @@ public class MyOwnCourse extends Controller{
 
     	MyOwnCourse.myOwnCourse(course.id,0);
     }
-    public static void addVideo(String topic, long courseId, String name, String url) {
+    public static void addVideo(long videoId, String topic, long courseId, String name, String url) {
+    	System.out.println(videoId+"       111111111111111111111");
     	System.out.println(url.indexOf("watch"));
     	if(url.contains("watch")){
     		url = url.substring(0,url.indexOf("watch"))+"embed/"+url.substring(url.indexOf("=")+1);
@@ -175,7 +203,31 @@ public class MyOwnCourse extends Controller{
     	}
     	Video video = new Video(course, topic, position, name, date, url);
     	video.save();
-    	myOwnCourse(courseId,0);
+    	if(videoId!=0){
+    		videoLesson(courseId, videoId);
+    	}else{
+    		lesson(courseId);
+    	}    	
+    }   
+    public static void addLesson(long lessonId, String topic, long courseId, String name, String url, 
+    		File file) {
+    	Date date = new Date();
+    	int position = 1;
+    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
+    	if(course==null){
+    		course = Course.getCourseById(courseId);    		
+    		Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
+    	}
+    	Lesson lesson = new Lesson(course, topic, position, name, date);
+    	lesson.save();
+    	Files files =  new Files(date, file, lesson);
+    	files.save();
+    	lesson(courseId);
+//    	if(videoId!=0){
+//    		videoLesson(courseId, videoId);
+//    	}else{
+//    		lesson(courseId);
+//    	}    	
     }   
     public static void removeVideo(long courseId, String videoUrl) {
     	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
@@ -435,7 +487,7 @@ public class MyOwnCourse extends Controller{
 //    	assignmentFeedback(courseId, assignmentId,userAssignment);
     }
     
-    public static void discussion(long courseId,String search){
+    public static void discussion(long courseId,String search,int page){
     	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
     	if(course==null){
     		course = Course.getCourseById(courseId);    		
@@ -449,17 +501,36 @@ public class MyOwnCourse extends Controller{
 //    	}else{
 //    		questions = Question.getCourseQuestions(course,"vote");
 //    	}
-    	List<Question> aQuestions = Question.getCourseQuestions(course,"active");
-    	List<Question> nQuestions = Question.getCourseQuestions(course,"new");
-    	List<Question> vQuestions = Question.getCourseQuestions(course,"vote");
+    	System.out.println("page is "+page);
+    	int currentPage = 0;
+    	if(page == 0){
+    		currentPage = PaginationInfo.getCurrentPage();
+    	}else{
+    		currentPage = page;
+    	}
+    	int perPage = 10;
+    	List<Question> aQuestions = Question.getCourseQuestions(course,"active",currentPage,perPage);
+    	int total = models.Question.all().fetch().size();
+    	System.out.println(currentPage);
+    	System.out.println(aQuestions.size());
+//    	List<Question> nQuestions = Question.getCourseQuestions(course,"new");
+//    	List<Question> vQuestions = Question.getCourseQuestions(course,"vote");
     	
-    	ValuePaginator vpaginator = new ValuePaginator(aQuestions);    	
-    	vpaginator.setPageSize(2);
-    	vpaginator.setBoundaryControlsEnabled(true);
-    	vpaginator.setPagesDisplayed(0);
-    	System.out.println(vpaginator.getPagesDisplayed());
-    	renderArgs.put("aQuestions", vpaginator);
-    	renderArgs.put("page", vpaginator.getPageNumber());
+    	//ValuePaginator vpaginator = new ValuePaginator(aQuestions);    	
+    	
+    	
+    	
+    	PaginationInfo paginationInfo = new PaginationInfo("MyOwnCourse.discussion",
+                currentPage, perPage, total,""+courseId);
+    	
+//    	vpaginator.setPageSize(2);
+//    	vpaginator.setBoundaryControlsEnabled(false);
+//    	vpaginator.setPagesDisplayed(0);
+//    	System.out.println(vpaginator.getPagesDisplayed());
+//    	renderArgs.put("aQuestions", vpaginator);
+//    	System.out.println(vpaginator.getLastRowIndex());
+//    	
+//    	renderArgs.put("page", vpaginator.getPageNumber());
 //    	
 //    	vpaginator = new ValuePaginator(nQuestions);    	
 //    	vpaginator.setPageSize(2);
@@ -475,7 +546,7 @@ public class MyOwnCourse extends Controller{
     	if(search==null){
     		search = "acitve";
     	}
-    	render(course,search);    	
+    	render(course,search,aQuestions,paginationInfo);    	
     }
     public static void listNewQuestions() {
     	List<Question> questions = Question.findAll();
@@ -494,12 +565,12 @@ public class MyOwnCourse extends Controller{
     	User user = (User)renderArgs.get("user");
     	Question question = new Question(course, user, title, text, tags);
     	question.save();
-    	discussion(courseId,null);
+    	discussion(courseId,null,1);
     }
     public static void deleteQuestion(long courseId,long questionId){
     	Question question = Question.getQuestionById(questionId);
     	question.delete();    	
-    	discussion(courseId,null);
+    	discussion(courseId,null,1);
     }
     public static void question(long courseId,long questionId){
     	Question question = Question.getQuestionById(questionId);
@@ -538,4 +609,94 @@ public class MyOwnCourse extends Controller{
     	}
     	render(course);
     }
+    public static void courseSettings(long courseId){
+    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
+    	if(course==null){
+    		course = Course.getCourseById(courseId);    		
+    		Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
+    	}
+    	render(course);
+    }
+    public static void courseTabs(long courseId){
+    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
+    	if(course==null){
+    		course = Course.getCourseById(courseId);    		
+    		Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
+    	}
+    	render(course);
+    }
+    public static void courseTeachers(long courseId){
+    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
+    	if(course==null){
+    		course = Course.getCourseById(courseId);    		
+    		Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
+    	}
+    	render(course);
+    }
+    public static void courseStudents(long courseId){
+    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
+    	if(course==null){
+    		course = Course.getCourseById(courseId);    		
+    		Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
+    	}
+    	render(course);
+    }
+    public static void calendar(long courseId){
+    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
+    	if(course==null){
+    		course = Course.getCourseById(courseId);    		
+    		Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
+    	}
+    	render(course);
+    }
+    public static void lesson(long courseId){
+//    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
+//    	if(course==null){
+//    		course = Course.getCourseById(courseId);    		
+//    		Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
+//    	}
+    	Course course = Course.getCourseById(courseId);
+    	Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
+    	render(course);
+    }
+    public static void textLesson(long courseId,long lessonId){
+//    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
+//    	if(course==null){
+//    		course = Course.getCourseById(courseId);    		
+//    		Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
+//    	}
+    	Course course = Course.getCourseById(courseId);
+    	Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");    	
+    	Lesson lesson = Lesson.findById(lessonId);
+    	render(course,lesson);
+    }
+    public static void editLesson(long courseId,long lessonId){
+    	Course course = Course.getCourseById(courseId);
+    	Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
+    	render(course);
+    }
+    public static void createLesson(long courseId){
+    	Course course = Course.getCourseById(courseId);
+    	Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
+    	render(course);
+    }
+    public static void videoLesson(long courseId,long videoId){
+//    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
+//    	if(course==null){
+//    		course = Course.getCourseById(courseId);    		
+//    		Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
+//    	}
+    	Course course = Course.getCourseById(courseId);
+    	Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");    	
+    	Video video = Video.findById(videoId);    	
+    	render(course,video);
+    }
+    public static void downloadLessonFile(long id) {
+ 	   //final User user = User.findById(id);
+ 	   final Files file = Files.findById(id);
+ 	   notFoundIfNull(file);
+ 	   response.setContentTypeIfNotSet(file.file.type());
+ 	   renderBinary(file.file.get(), file.fileName);
+	}
+    
 }

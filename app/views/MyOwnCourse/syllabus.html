@@ -9,8 +9,11 @@
    
 <div class="container">   
 	<div class="row">	
-		<div class="span9">	
-				<h2>Syllabus</h2>
+		#{leftMenu  course:course, isActive:'1' /}
+		<div class="span8">	
+		<div class="b-box">
+			<div class="b-box__header"><h3>Syllabus</h3></div>
+			<div class="b-box__content">
 				<p>
 				#{verbatim}
 				${course.syllabus}
@@ -29,6 +32,11 @@
 						<button type="submit" class="btn btn-primary">Edit syllabus</button>							
 					</form>
 				#{/if}
+			</div>
+			</div>
+		</div>
+		<div class="span3">
+			<a href="@{MyOwnCourse.courseInfo(course.id)}">News</a>		
 		</div>
 	</div>					
 </div> 

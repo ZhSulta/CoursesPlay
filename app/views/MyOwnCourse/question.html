@@ -80,7 +80,11 @@ width: 32px;
     </style>	
 <div class="container">   
 	<div class="row">	
-		<div class="span9">
+	#{leftMenu  course:course, isActive:'5' /}	
+		<div class="span8">
+		  <div class="b-box">
+		  <div class="b-box__header"><h3>Questions</h3></div>
+		  <div class="b-box__content">
 			<div class="headNormal">
 				<h3><a href="#">${question.title}</a></h3>
 			</div> 
@@ -208,6 +212,8 @@ width: 32px;
 						<input type="hidden" name="questionId" value="${question.id}">            		                 						   							
 			        <button type="submit" class="btn btn-success">Post Your Answer</button>			
 				#{/form}
+			</div>
+			</div>
 			</div>
 		</div>					
 	</div>

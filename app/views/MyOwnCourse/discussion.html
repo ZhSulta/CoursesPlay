@@ -58,10 +58,12 @@ border-top: 0;
     
 <div class="container">   
 	<div class="row">
-		<div class="span12">
-		  <div class="span9">
-		  <h3>Top Questions</h3>		  
-			#{paginate.list items:aQuestions, as:'q'} 
+	#{leftMenu  course:course, isActive:'5' /}		
+		  <div class="span8">
+		  <div class="b-box">
+		  <div class="b-box__header"><h3>Questions</h3></div>
+		  <div class="b-box__content">
+			#{list items:aQuestions, as:'q'} 
 				<div class="short-summary">
 				    <div class="counts">
 				        <div class="votes">
@@ -80,7 +82,7 @@ border-top: 0;
 				
 				    <div class="question-summary-wrapper">
 				        <h4>
-				        	<a title="${q.text.length() > 200 ? q.text[0..200] + '…' : q.text}" href="@{MyOwnCourse.question(courseId,q.id)}" >${q.title}</a>
+				        	<a title="${q.text.length() > 200 ? q.text[0..200] + '…' : q.text}" href="@{MyOwnCourse.question(course.id,q.id)}" >${q.title}</a>
 				        </h4>
 				        <div class="userinfo">
 				            <img src="@{Application.userPhoto(q.user.id)}" width="32" height="32">				      								    
@@ -95,16 +97,19 @@ border-top: 0;
 				            </a>
 				            <br/>
 				            #{if session.email.equals(q.user.email)}						            
-				            	<a href="@{MyOwnCourse.deleteQuestion(courseId,q.id)}">Delete</a>
+				            	<a href="@{MyOwnCourse.deleteQuestion(course.id,q.id)}">Delete</a>
 				           	#{/if}		
-				        </div>
-				        
+				        </div>				        
 				    </div>
-				</div>
-			#{/paginate.list}
-			#{paginate.controls items:aQuestions /}			 
+				</div>			
+			#{/list}
+			#{if paginationInfo.getNumPages() > 1}
+				#{pagination paginationInfo, colspan:'1', courseId:course.id/}
+			#{/if}
+			</div>
+			</div>			 
 		</div>  
-		<div class="span2">
+		<div class="span3">
 		
 			<a data-toggle="modal" href="#myModal" class="btn btn-primary pull-right">Ask Question</a>	  	
 		  	<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
@@ -140,6 +145,5 @@ border-top: 0;
 				#{/form}	
 			</div>	  	
 		</div>
-	  </div>
-	</div>					
-</div>
+	</div>
+</div>					

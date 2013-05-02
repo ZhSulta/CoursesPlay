@@ -9,8 +9,8 @@ import org.apache.commons.mail.*;
 import models.User;
  
 public class Mails extends Mailer {
-	public static String projectName = "Online Courses";
-	public static String projectSite = "onlinecourses.kz";
+	public static String projectName = "Code School";
+	public static String projectSite = "http://localhost:9000";
 	public static void welcome() {
 	      setSubject("Welcome %s", "sultan");
 	      addRecipient("zh.sulta@gmail.com");
@@ -30,6 +30,16 @@ public class Mails extends Mailer {
 			username = email;			
 			send(username,pName,pSite);
 		}
+        
+	}
+	public static void verifyUser(String email,String address) {
+		setSubject("Notification: %s", projectName);
+		String pName = projectName;
+		addRecipient(email);
+        setFrom("Me <me@me.com>");
+        address = projectSite +"/Application/verify?address="+email;
+		send(email,pName,address);
+		
         
 	}
 //   public static void welcome(User user) {

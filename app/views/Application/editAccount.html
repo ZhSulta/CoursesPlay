@@ -10,6 +10,7 @@
 <div class="container">   
 	<div class="row">
 		<div class="span9">
+		
 		#{form @Application.saveProfile(), class:'form-horizontal', enctype:'multipart/form-data'}
 			#{if flash.error}
 				<h6 class="error">
@@ -26,7 +27,7 @@
 			    <div class="control-group">
 				      <label class="control-label" for="avatar">Photo</label>
 				      <div class="controls">		
-				      	<img src="@{Application.userPhoto(user.id)}" style="width: 120px; height: 120px;'">
+				      	<img title="${user.photoFileName}" src="@{Application.userPhoto(user.id)}" style="width: 120px; height: 120px;'">
 				      	<input type="file" id="avatar" name="avatar" />					      	    
 				      </div>
 				</div>
