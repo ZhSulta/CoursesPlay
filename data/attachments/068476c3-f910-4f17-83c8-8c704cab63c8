@@ -1,0 +1,655 @@
+<div class="body">
+<div class="panel"
+        style="/*background: url(img/kiosk/atf_logo.jpeg) no-repeat 60px 8px #f2f2f2;*/ width: 600px; margin: auto auto; text-align: center;">
+        <div style="margin-bottom: 32px; margin-top: -50px; "><img id="kioskLogo" src="/img/kiosk/atf_bank0.png"></div>
+        <div id="select_service" class="scene-show">
+            <div id="iinFake" onclick="nextScene('numpad');"></div>
+            <div style="z-index: 100;">
+                <div class="menu buttons group" id="lanes"></div>
+                <div class="horizontal-menu buttons group" id="printBtn">
+                    <div id="kkButton" class="button" onclick="printTicket('kk');"
+                        style="width: 45%;">Распечатать(каз)</div>
+                    <div id="ruButton" class="button" onclick="printTicket('ru');"
+                        style="width: 45%;">Распечатать(рус)</div>
+                </div>
+                <div class="horizontal-menu buttons group" id="backBtn" style="display:none;">
+                    <div class="button" onclick="mainMenu()"
+                        style="width: 90%;">На главное меню</div>
+                </div>
+            </div>
+            <div id="numpad" style="display: none;">
+                <div class="horizontal-menu numpad buttons" style="width: 380px;">
+                    <row>
+                    <div class="button digit">1</div>
+                    <div class="button digit">2</div>
+                    <div class="button digit">3</div>
+                    </row>
+                    <row>
+                    <div class="button digit">4</div>
+                    <div class="button digit">5</div>
+                    <div class="button digit">6</div>
+                    </row>
+                    <row>
+                    <div class="button digit">7</div>
+                    <div class="button digit">8</div>
+                    <div class="button digit">9</div>
+                    </row>
+                    <row>
+                    <div class="button" onclick="removeDigit()">&lt;</div>
+                    <div class="button digit">0</div>
+                    <div class="button" onclick="clearDigits()">CLR</div>
+                    </row>
+                </div>
+                <div class="horizontal-menu buttons group" style="width: 380px;">
+                    <div id="okButton" class="button" style="width: 140px;">OK</div>
+                    <div class="button" onclick="nextScene('lanes'); clearDigits();" style="width: 140px;">Назад</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="print">
+    <img id="printLogo" src="/img/kiosk/icon_tson_print.png"
+        style="width: 100px; margin: 10px 0px 10px 80px;" />
+    <h2>
+        <b><span id="groupShortName"></span></b> <span id="groupLongName"></span>
+    </h2>
+    <h3 id="ticketCode" style="margin-top:45px;height:90px;"></h3>
+    <ul>
+        <li><b id="clientIdMessage"></b> <span id="clientId"></span></li>
+        <li><b id="ticketCreateDateMessage"></b> <span id="ticketCreateDate"></span></li>
+        <li><b id="laneTypesMessage"></b> <span id="laneTypes"></span></li>
+    </ul>
+
+
+    <div align="center" style="margin: 10px 0px 10px">
+        <b id="waitingClientsPrintMessage"></b>
+    </div>
+
+</div>
+
+<div id="message" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Внимание!</h3>
+  </div>
+  <div id="messageBody" class="modal-body"></div>
+  <div class="modal-footer">
+    <a href="javascript:jQuery('#message').modal('hide');" class="btn btn-primary">OK</a>
+  </div>
+</div>
+
+<style>
+.laneCounters {
+    text-align: right;
+    margin-top: -31px;
+    margin-right: 5px;
+}
+</style>
+<script>
+    var _kk = {};
+    var _ru = {};
+
+    var currentScene = "lanes";
+    var iinFake;
+
+    var laneTypes = new Array();
+
+    var lanes = "";
+    var kkButton;
+    var ruButton;
+
+    var _lanes = null;
+    var _reservations = new Array();
+    var _laneTree = null;
+    var _group = {};
+    var _timer = null;
+
+    function _init(data){
+        jQuery("head").append(jQuery("<link rel='stylesheet' href='css/kiosk.css' type='text/css'/>"));
+        if(data.logo){
+//          jQuery(".panel").attr("style","background: url("+data.logo+") no-repeat 60px 8px #f2f2f2; width: 600px; margin: auto auto; text-align: center;")
+
+            jQuery('#kioskLogo').attr('src', data.logo);
+        }
+
+        if(data.lanes){
+            _lanes = data.lanes;
+            console.log('sulta');
+            console.log('lanes are here');
+            console.log(_lanes);
+        }
+        if(data.group){
+            _group = data.group;
+        }
+        if(data.reservations){
+            _reservations = data.reservations;
+        }
+        jQuery("#navBar").hide();
+        location.hash = "#!kiosk";
+        iinFake = jQuery("#iinFake");
+        kkButton = jQuery("#kkButton"); 
+        ruButton = jQuery("#ruButton");     
+        console.log ('-----------------------------------');
+        console.log (data.tree);
+        if(data.tree){
+            var str = data.tree.replace(/&(lt|gt|quot|apos);/g, function (m, p) { 
+                return (p == 'lt')? '<' : (p == 'gt') ? '>' : (p == 'apos' ? "'" : '"');
+            });
+            data.tree = JSON.parse(str);
+            _laneTree = data.tree;
+            console.log (_laneTree);
+            mainMenu();
+        }else{
+            jQuery(_lanes).each(function(ix){
+                var el = _lanes[ix];
+                jQuery("#lanes").append("<div id='"+el.id+"' class='laneType button' onclick=\"toggleLaneType('"+el.id+"')\">"+el.ru + "</div>");
+            });
+        }
+
+        jQuery('#printLogo').attr('src', data.ticketLogo);//'http://localhost:7070/img/kiosk/tson_logo.png')
+        jQuery('#kioskLogo').attr('src', data.logo);
+
+        jQuery(".digit").click(function() {
+            addDigit(jQuery(this).text());
+        });
+        jQuery(document).keyup(function(e){
+            if(e.which >= 48 && e.which <= 57){
+                addDigit(e.which-48);
+            }else if(e.which >=65 && e.which<=90){
+                addDigit(String.fromCharCode(e.which));
+            }else if(e.which == 8 || e.which == 46){
+                clearDigits();
+            }else if(e.which == 27){
+                clearAll();
+            }
+            return false;
+        });
+
+        jQuery('#okButton').click(function() {
+            _reservations.forEach(function(reservation) {
+                console.log(reservation.id + ' ==  ' + iinFake.text());
+                if ( reservation.id == iinFake.text() ) {
+                    console.log(reservation.id + ' found');
+                    reservationIsFound = true;
+                }
+            });
+/*          var reservationIsFound = false;
+            
+            _reservations.forEach(function(reservation) {
+                console.log(reservation.id + ' ==  ' + iinFake.text());
+                if ( reservation.id == iinFake.text() ) {
+                    console.log(reservation.id + ' found');
+                    reservationIsFound = true;
+                }
+            });
+
+            if (reservationIsFound)
+                nextScene('lanes');
+            else
+            {
+                jQuery('#messageBody').html('<p>Введенный Вами билет бронирования не найден!<br>Убедитесь в правильности кода Вашего билета.</p>');
+                jQuery('#message').modal('show');
+            }
+*/
+            var reservationIsFound = false;
+            console.log ('reservation');
+
+            jQuery(_reservations).each(function(ix){
+                var el = _reservations[ix];
+                console.log ('sulta');
+                if(el.id.toLowerCase()==iinFake.text().toLowerCase()){
+                    var rDate = {};
+                    var data = el.date.split(" ");
+                    var rDateArr = data[0].split(".");
+                    console.log("rDateArr " + rDateArr);
+                    var rTimeArr = data[1].split(":");
+                    rDate.date = Number(rDateArr[0]);
+                    rDate.month = Number(rDateArr[1]);
+                    rDate.hour = Number(rTimeArr[0]);
+                    rDate.minute = Number(rTimeArr[1]);
+                    var now = new Date();
+                    
+                    var date_s = new Date ();
+                    date_s.setDate(Number(rDateArr[0]));
+                    date_s.setMonth(Number(rDateArr[1])-1);
+                    date_s.setHours(Number(rTimeArr[0]));
+                    date_s.setMinutes(Number(rTimeArr[1]));
+                     
+                    console.log (date_s+" el date");
+                    console.log (el.date+" el date");
+                    
+                    console.log (now);
+                    
+                    console.log('rDate d ' + rDate.date + ' mon ' + rDate.month + ' h ' + rDate.hour + ' min ' + rDate.minute);
+
+                    now.setMinutes(now.getMinutes()<30?0:30);
+
+                    console.log('c1 ' + (now.getMonth()+1) + ' <= ' + (date_s.getMonth()+1));
+                    console.log('c2 ' + now.getDate() + ' <= ' + date_s.getDate());
+                    console.log('c3 ' + now.getHours() + ' <= ' + date_s.getHours());
+                    console.log('c4 ' + now.getMinutes() + ' <= ' + date_s.getMinutes() );
+
+
+
+
+//                      console.log(date_s.getTime()+" date_s.getTime()");
+//                      console.log(now.getTime()+" now.getTime()");
+
+                    
+                    if(date_s.getTime() == now.getTime()){
+                        jQuery(el.lanes).each(function(ixx){
+                            toggleLaneType(el.lanes[ixx]);
+                        });
+                        
+                    }else{
+                        console.log("RESERVATION EXPIRED " + el.id);
+
+                        jQuery('#messageBody').html('<p>Время введенный Вами билета бронирования истек!</p>');
+                        jQuery('#message').modal('show');
+                    }
+
+                    reservationIsFound = true;
+                }
+            });
+
+            if (!reservationIsFound) {
+                jQuery('#messageBody').html('<p>Введенный Вами билет бронирования не найден!<br>Убедитесь в правильности кода Вашего билета.</p>');
+                jQuery('#message').modal('show');
+            }
+            console.log(reservationIsFound);
+            if (ruButton.attr('class').indexOf('disabled') > -1)
+                togglePrintButtons();
+        });
+
+        //onConnect();
+    }
+
+    function mainMenu(){
+        jQuery("#lanes div").remove();
+        jQuery(_laneTree).each(function(ix){
+            console.log ('_laneTree');
+            var el = _laneTree[ix];
+            jQuery("#lanes").append("<div class='mainLane button' data-id='"+el.id+"'>"+el.ru+"</div>");
+        });
+        jQuery("#backBtn").hide();
+        jQuery("#printBtn").hide();
+
+        jQuery(".mainLane").click(function(){
+            console.log ('mainLane');
+            console.log (jQuery(this).attr("data-id"));
+            console.log (getMainLane(jQuery(this).attr("data-id")));
+            var laneArr = getMainLane(jQuery(this).attr("data-id")).sublanes;
+            console.log (laneArr);
+            jQuery("#lanes div").remove();
+            jQuery(laneArr).each(function(ix){
+                var lane = getLane(laneArr[ix]);
+                jQuery("#lanes").append("<div id='"+lane.id+"' class='laneType button' onclick=\"toggleLaneType('"+lane.id+"')\">"+lane.ru+"</div>");   
+            });
+            jQuery("#backBtn").show();
+            jQuery("#printBtn").show();
+        });
+        clearAll();
+    }
+
+    function getMainLane(uuid){
+        var result = null;
+        jQuery(_laneTree).each(function(ix){
+            var el = _laneTree[ix];
+            if(el.id==uuid){
+                result = el;
+            }
+        });
+        return result;      
+    }
+
+    function getLane(lane){
+        var result = null;
+        jQuery(_lanes).each(function(ix){
+            var el = _lanes[ix];
+            if(el.id==lane){
+                result = el;
+            }
+        });
+        return result;
+    }
+
+    function bot(){
+        _bot = true;
+        setInterval(function(){
+            var r = parseInt(Math.random()*1000000);
+            var laneArr = new Array();
+            var btns = jQuery("#lanes div");
+            if(r>500000){
+                btns[0].click();
+                if(r>800000){
+                    btns[1].click();
+                }
+                if(r>900000){
+                    btns[2].click();
+                }
+            }else{
+                btns[1].click();
+                if(r<200000){
+                    btns[0].click();
+                }
+                if(r<100000){
+                    btns[6].click();
+                }
+            }
+            if(r%3==0){
+                btns[2].click();
+            }
+            if(r%4==0){
+                btns[3].click();
+            }
+            if(r%5==0){
+                btns[4].click();
+            }
+            if(r%7==0){
+                btns[5].click();
+            }
+            iinFake.text(r);
+            ruButton.click();
+        },2500);
+    }
+
+    function _onMessage(text){
+        console.log("_onMessage:"+text);
+        var msg = {};
+        try{
+            msg = JSON.parse(text);
+        }catch(e){
+            console.warn("Kiosk got non-JSON message:"+text);
+        }
+        if(msg.ticket){
+            console.log('msg.ticket');
+            jQuery("#groupShortName").text(_group.rushort);
+            jQuery("#groupLongName").text(_group.ru);
+            jQuery("#ticketCode").text(msg.ticket.code);
+            jQuery("#clientIdMessage").text("ID:");
+            var clientId = iinFake.text();
+            if(clientId.length==0){
+                clientId = "000000000000";
+            }
+            jQuery("#clientId").text(clientId);
+            jQuery("#ticketCreateDateMessage").text("Дата и время:");
+            var date = new Date();
+            jQuery("#ticketCreateDate").text(date.toJSON().split("T")[0]+" "+date.toTimeString().split(" ")[0]);
+            jQuery("#laneTypesMessage").text("Выбранные услуги:");
+
+            var a = "";
+
+            jQuery(msg.ticket.lanes).each(function(ix){
+                if(msg.ticket.lanes[ix].length>0) {
+                    var el = msg.ticket.lanes[ix]
+
+                    var waitingClients = 0;
+                    for (var prop in _lanes) {
+                        lane = _lanes[prop];
+
+                        if (lane.id == getLane(el).id) {
+                            if (msg.ticket.isReserved)
+                                waitingClients = lane.reserved - 1;
+                            else
+                                waitingClients = lane.count + lane.reserved - 1;
+                        }
+                    }
+
+                    a += getLane(el).ru + " (" + waitingClients +")" + ",";
+                }
+            });
+            a = a.substr(0,a.length-1);
+            jQuery("#laneTypes").text(a);
+
+            var waitingClients = 0;
+
+            jQuery(msg.ticket.lanes).each(function(ix){
+                var b = msg.ticket.lanes[ix];
+
+                jQuery(_lanes).each(function(jx){
+                    var el = _lanes[jx];
+
+                    if (el.id == b) {
+                        console.log(el.count + ' / ' + el.reserved);
+                        if (msg.ticket.isReserved)
+                        {
+                            waitingClients = waitingClients + el.reserved - 1;
+
+                            var index = -1;
+                            for (var prop in _reservations) {
+                                var reservation = _reservations[prop];
+
+                                if (reservation.id == msg.ticket.clientIin && msg.ticket.clientIin != undefined) {
+                                    index = prop;
+                                    break;
+                                }
+                            }
+                            if (index != -1)
+                                _reservations.splice(index, 1);
+
+                            console.log("reserved");
+                        }
+                        else
+                        {
+                            waitingClients = waitingClients + el.count + el.reserved - 1;
+                            console.log("not reserved");
+                        }
+                    }
+                });
+            });
+
+            if (waitingClients == 0 || waitingClients == 1)
+                jQuery("#waitingClientsPrintMessage").text('Перед вами ожидает ' + waitingClients + ' клиент.');
+            else
+                jQuery("#waitingClientsPrintMessage").text('Перед вами ожидают ' + waitingClients + ' клиента.');
+
+            printFinally();
+            clearAll();
+        }
+
+        else if (msg.pubsub) {
+            console.log("**** PUBSUB ****");
+            console.log(msg);
+
+            jQuery(msg.lanes).each(function(ix){
+                var a = msg.lanes[ix];
+
+                jQuery(_lanes).each(function(jx){
+                    var el = _lanes[jx];
+                    console.log(el.id+" / "+a.id+" "+(el.id==a.id));
+                    if (el.id==a.id) {
+                        el.count = a.count;
+                        el.reserved = a.reserved;
+                        _lanes[jx] = el;
+                        console.log("updating:"+ el.id);
+                        jQuery("#laneCounter"+el.id).text(el.count + el.reserved);
+                    }
+                });
+            });
+
+            if(msg.reservation){
+                _reservations.push(msg.reservation);
+            }
+        }
+    }
+
+    function onConnect(){
+        setTimeout(function(){
+            jQuery(".panel").fadeIn("slow");
+            nextScene("lanes");
+            togglePrintButtons();
+        },600);
+        console.log(XmppClient.connection.sid);
+    }
+
+    function _onStatus(status){
+        if(status=="CONNECTED" || status=="ATTACHED"){
+            onConnect();
+        }
+        if(status=="DISCONNECTED"){
+            jQuery(".panel").fadeOut("slow");
+        }
+    }
+
+    function nextScene(name){
+        if(currentScene){ 
+            jQuery("#" + currentScene).hide();
+        }
+
+        if (name == 'numpad') {
+            kkButton.addClass("disabled");
+            ruButton.addClass("disabled");
+        }
+        else
+            togglePrintButtons();
+
+        jQuery("#" + name).show();
+        currentScene = name;
+    }
+
+
+    function addDigit(digit){
+        if(iinFake.text().length < 13){
+            iinFake.text(iinFake.text() + digit);
+            clearTimeout(_timer);
+//          _timer = setTimeout(function(){
+/*              reservationIsFound = false;
+                
+                jQuery(_reservations).each(function(ix){
+                    var el = _reservations[ix];
+                    if(el.id.toLowerCase()==iinFake.text().toLowerCase()){
+                        var rDate = {};
+                        var data = el.date.split(" ");
+                        var rDateArr = data[0].split(".");
+                        console.log("rDateArr " + rDateArr);
+                        var rTimeArr = data[1].split(":");
+                        rDate.date = Number(rDateArr[0]);
+                        rDate.month = Number(rDateArr[1]);
+                        rDate.hour = Number(rTimeArr[0]);
+                        rDate.minute = Number(rTimeArr[1]);
+
+                        console.log('rDate d ' + rDate.date + ' mon ' + rDate.month + ' h ' + rDate.hour + ' min ' + rDate.minute);
+                        
+                        var now = new Date();
+                        var flooredMinutes = now.getMinutes()<30?0:30;
+
+                        console.log('c1 ' + (now.getMonth()+1) + ' <= ' + rDate.month);
+                        console.log('c2 ' + now.getDate() + ' <= ' + rDate.date);
+                        console.log('c3 ' + now.getHours() + ' <= ' + rDate.hour);
+                        console.log('c4 ' + flooredMinutes + ' <= ' + rDate.minute);
+                        
+                        if((now.getMonth()+1)<=rDate.month
+                                && now.getDate()<=rDate.date
+                                && now.getHours()<=rDate.hour
+                                && flooredMinutes<=rDate.minute){
+                            jQuery(el.lanes).each(function(ixx){
+                                toggleLaneType(el.lanes[ixx]);
+                            });
+                        }else{
+                            console.log("RESERVATION EXPIRED " + el.id);
+
+                            jQuery('#messageBody').html('<p>Время введенный Вами билета бронирования истек!</p>');
+                            jQuery('#message').modal('show');
+                        }
+
+                        reservationIsFound = true;
+                    }
+                });
+
+                if (!reservationIsFound) {
+                    jQuery('#messageBody').html('<p>Введенный Вами билет бронирования не найден!<br>Убедитесь в правильности кода Вашего билета.</p>');
+                    jQuery('#message').modal('show');
+                }
+//          },1000);
+            togglePrintButtons();
+*/      }
+    }
+
+    function removeDigit(){
+        iinFake.text(iinFake.text().substring(0,iinFake.text().length-1));
+    }
+
+    function clearDigits(){
+        iinFake.text("");
+    }
+
+    function printTicket(language){
+        if(lanes && lanes.length > 0){
+            enqueue(language);
+        } else {
+            return false;
+        }
+    }
+
+    function printFinally(){
+        if(_bot == false){
+            window.print();
+        }
+        clearAll();
+    }
+
+    function enqueue(language){
+        var cId = iinFake.text();
+        if(cId.length==0){
+            cId = "000000000000";
+        }
+        var arr = lanes.split(";");
+        var laneArr = new Array();
+        jQuery(arr).each(function(ix){
+            if(arr[ix]!="" && arr[ix].length!=0){
+                laneArr.push(arr[ix]);
+            }
+        });
+
+        var msg = {action:"enqueue",lang:language,client:cId,lanes:laneArr};
+        XmppClient.send("queue",JSON.stringify(msg));
+    }
+
+    function clearAll(){
+        lanes = "";
+        clearDigits();
+        clearLaneTypes();
+        togglePrintButtons();
+        nextScene('lanes');
+    }
+
+    function toggleLaneType(laneTypeName){
+        if(lanes.indexOf(laneTypeName+";") >= 0){
+            lanes = lanes.replace(laneTypeName+";", "");
+        } else {
+            lanes += laneTypeName+";";
+        }
+        clearLaneTypes();
+        var splittedLanes = lanes.split(";");
+        jQuery(splittedLanes).each(function(index){
+            laneTypes.push(splittedLanes[index]);
+            jQuery("#" + splittedLanes[index]).addClass("active");              
+        });
+
+        togglePrintButtons();           
+        return false;
+    }
+
+    function clearLaneTypes(){
+        mainLaneType = null;
+        laneTypes = new Array();
+        jQuery(".laneType").each(function(index) {
+            jQuery(this).removeClass("active");
+        });
+    }
+
+    function togglePrintButtons(){
+        console.log("togglePrintButtons() clicked");
+        if(!lanes || lanes.length < 1){
+            console.log("Buttons must be disabled");
+            kkButton.addClass("disabled");
+            ruButton.addClass("disabled");
+        }else {
+            console.log("Buttons must be enabled");
+            kkButton.removeClass("disabled");
+            ruButton.removeClass("disabled");
+        }
+    }
+</script>

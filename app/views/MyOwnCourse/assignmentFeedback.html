@@ -14,7 +14,7 @@
   	    				<h2>${assignment.topic}</h2>
 						<h3>${assignment.title}</h3>
 						<p>
-						You submitted this quiz on <b>${userAssignment.dateOfAttempt.format('dd MMM hh:mm:ss')}</b>
+						You submitted this quiz on <b>${userAssignment.dateOfAttempt.format('dd MMM HH:mm:ss')}</b>
 						You got a score of <b>${userAssignment.score}</b> out of <b>${totalScore}</b>.
 						You can <a href="@{MyOwnCourse.assignment(course.id,assignment.id)}">attempt again</a> in 1 minutes.
 						</p>

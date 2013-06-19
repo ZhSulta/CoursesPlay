@@ -14,7 +14,7 @@
 					${a.text}
 				#{/verbatim}
 				<div class="pull-right">&{a.date}</div>
-				#{if course.user.email == session.email}
+				#{if course.user?.email == session.email}
 				<br/>				
 				<a data-toggle="modal" href="#myModal">Edit</a>
 				<!-- 
@@ -24,7 +24,7 @@
 				#{/if}
 				<hr />
 			#{/list}
-			#{if course.user.email == session.email}
+			#{if course.user?.email == session.email}
 			<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
 		          <div class="modal-header">
 		          	<a class="close" data-dismiss="modal">×</a>

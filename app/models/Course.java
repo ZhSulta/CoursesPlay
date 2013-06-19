@@ -30,6 +30,12 @@ public class Course extends Model{
 	public Date date;
 	public Date startDate;
 	public boolean isActive;
+	
+	public boolean isTimeTable = true;
+	public boolean isLessons = true;
+	public boolean isAssignments = true;
+	public boolean isDiscussions = true;
+	
 	@ManyToOne
 	public User user;
 	@OneToMany(mappedBy="course", cascade=CascadeType.ALL, fetch = FetchType.EAGER)
@@ -38,6 +44,8 @@ public class Course extends Model{
 	public Set<Video> videos;
 	@OneToMany(mappedBy="course", cascade=CascadeType.ALL, fetch = FetchType.EAGER)
 	public Set<Lesson> lessons;
+	@OneToMany(mappedBy="course", cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	public Set<Homework> homeworks;
 	@OneToMany(mappedBy="course", cascade=CascadeType.ALL, fetch = FetchType.EAGER)
 	public Set<Question> questions;
 	@OneToMany(mappedBy="course", cascade=CascadeType.ALL, fetch = FetchType.EAGER)
@@ -65,17 +73,19 @@ public class Course extends Model{
 		this.questions = new HashSet<Question>();
 		this.assignments = new HashSet<Assignment>();
 		this.myCourses = new HashSet<MyCourse>();
+		this.homeworks = new HashSet<Homework>();
+		this.lessons = new HashSet<Lesson>();
 	}
 	public static List<Course> getMyOwnCourses(User user){
 		 List<Course> courses = Course.find("byUser", user).fetch();
 		 return courses;
 	}
-	public static List<Course> getUniversityCourses(User user){
-		 List<Course> courses = Course.find("select c from Course c where c.user != :user and isActive = true").setParameter("user", user).fetch();
+	public static List<Course> getUniversityCourses(){
+		 List<Course> courses = Course.find("select c from Course c where university!=null and isActive = true").fetch();
 		 return courses;
 	}
-	public static List<Course> getUserCourses(User user){
-		 List<Course> courses = Course.find("select c from Course c where c.user != :user").setParameter("user", user).fetch();
+	public static List<Course> getUserCourses(){
+		 List<Course> courses = Course.find("select c from Course c where university=null and isActive = true").fetch();
 		 return courses;
 	}
 	public static List<Course> getActiveCourses(){

@@ -20,22 +20,6 @@
 	    	#{/else}
 	    	    <a href="@{MyOwnCourse.courseTabs(_course.id)}" class="b-box__link-element">Course Sections</a>
 	        </li>
-	        #{if _isActive=='3'}
-	    		<li class="b-box__link-element  current ">
-	        #{/if}
-	    	#{else}
-	    		<li class="b-box__link-element">
-	    	#{/else}
-	    	    <a href="@{MyOwnCourse.courseTeachers(_course.id)}" class="b-box__link-element">Teachers</a>
-	        </li>
-	        #{if _isActive=='4'}
-	    		<li class="b-box__link-element  current ">
-	        #{/if}
-	    	#{else}
-	    		<li  class="b-box__link-element">
-	    	#{/else}
-	    		<a href="@{MyOwnCourse.courseStudents(_course.id)}" class="b-box__link-element">Students</a>
-	        </li>
 	    </ul>
 	</div>
 </div>

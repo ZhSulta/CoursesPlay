@@ -18,6 +18,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import notifiers.Mails;
 import models.*;
 
@@ -43,8 +45,8 @@ public class Application extends Controller {
 		for(int i=0;i<myCourses.size();i++){
 			System.out.println(myCourses.get(i));
 		}
-		List<Course> universityCourses = Course.getUniversityCourses(user);		
-		List<Course> userCourses = Course.getUserCourses(user);
+		List<Course> universityCourses = Course.getUniversityCourses();		
+		List<Course> userCourses = Course.getUserCourses();
 		
 		render(universityCourses,userCourses,user);
     }
@@ -63,7 +65,8 @@ public class Application extends Controller {
     	render();
     }
     public static void code() {    	
-    	render();
+    	User user = Cache.get(session.getId() + "-user",User.class);
+    	render(user);
     }
     public static void jsCode() {    	
     	render();
@@ -103,7 +106,11 @@ public class Application extends Controller {
         if(validation.hasErrors()){
         	render("Application/signup.html",user1);
         }
+        pwd = DigestUtils.md5Hex(pwd);
         User user = new User(email,pwd);
+        if(email.contains("edu")){
+        	user.isTeacher = true;
+        }
         // Save
         user.save();
         String address = email;
@@ -195,7 +202,7 @@ public class Application extends Controller {
     	user.save();    	
     	editAccount();
     }
-    public static void help() {
-    	render();
+	public static void help() {
+		render("code/deckCode/introduction/index.html");
     }
 }

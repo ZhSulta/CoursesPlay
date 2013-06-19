@@ -154,7 +154,8 @@ function edit1(id,text,correctness,questionId)
 function newAnswer(id)
 {
 	console.log('sulta '+id);
-	$("#assignmentQuestion").val(questionId);
+	console.log(id);
+	$("#assignmentQuestion").val(id);
 	document.getElementById("correct").checked=false;
 }
 // Wait for the page to load first
@@ -163,9 +164,10 @@ window.onload = function() {
   //Get a reference to the link on the page
   // with an id of "mylink"
   //var a = document.getElementById("edit");
-  var a = document.getElementByName("edit");
+  //var a = document.getElementByName("edit");
   //Set code to run when the link is clicked
   // by assigning a function to "onclick"
+  /*
   a.onclick = function() {
 	console.log('sulta');
 	
@@ -173,5 +175,6 @@ window.onload = function() {
 	//document.getElementById('gadget_url').value = '';
     return true;
   }
+	  )*/
 }
 </script>

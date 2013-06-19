@@ -9,17 +9,26 @@ import play.modules.paginate.ValuePaginator;
 import play.mvc.*;
 import utils.PaginationInfo;
  
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import org.apache.commons.io.IOUtils;
+
 import notifiers.Mails;
 
 import models.*;
+import models.Calendar;
 @With(Secure.class)
 public class MyOwnCourse extends Controller{
+	private static final String File = null;
 	@Before
     static void setConnectedUser() {
         if(Security.isConnected()) { 
@@ -32,7 +41,8 @@ public class MyOwnCourse extends Controller{
         }
     }	
     public static void courseForm() {
-    	render();
+    	User user = (User)renderArgs.get("user");
+    	render(user);
     }
     public static void checkCourse(long courseId) {
 //    	User user = (User)renderArgs.get("user");
@@ -143,6 +153,7 @@ public class MyOwnCourse extends Controller{
     	Application.manageCourses();
     }
     public static void sendMessageToCourseOwner(long courseId,String email,String username){
+    	System.out.println(courseId+" " + email+" "+username);
     	Mails.correctCourse(email,username);
     	Application.manageCourses();
     }
@@ -168,6 +179,18 @@ public class MyOwnCourse extends Controller{
     	Cache.set(session.getId() + "_user-course_"+Id, course,"30mn");
     	MyOwnCourse.courseSettings(Id);
     }
+    public static void editCourseTabs(Long courseId, boolean isTimeTable,
+    		boolean isLessons, boolean isAssignments, boolean isDiscussions) {
+    	System.out.println(isTimeTable+" "+isLessons+" "+isAssignments+" "+isDiscussions);
+    	Course course = Course.getCourseById(courseId);
+    	course.isTimeTable = isTimeTable;	
+    	course.isLessons = isLessons;
+    	course.isAssignments = isAssignments;
+    	course.isDiscussions = isDiscussions;
+    	course.save();
+    	Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
+    	MyOwnCourse.courseTabs(courseId);
+    }
     public static void createCourse(String courseName,String smallDescription,String description,String university,
     		int duration, Blob photo,String videoUrl) {
     	System.out.println(videoUrl.indexOf("watch"));
@@ -185,63 +208,7 @@ public class MyOwnCourse extends Controller{
 
     	MyOwnCourse.myOwnCourse(course.id,0);
     }
-    public static void addVideo(long videoId, String topic, long courseId, String name, String url) {
-    	System.out.println(videoId+"       111111111111111111111");
-    	System.out.println(url.indexOf("watch"));
-    	if(url.contains("watch")){
-    		url = url.substring(0,url.indexOf("watch"))+"embed/"+url.substring(url.indexOf("=")+1);
-    	}
-    	url+="?autoplay=0&amp;color=red&amp;html5=1&amp;rel=0&amp;showinfo=0&amp;theme=light&amp;wmode=opaque&amp;enablejsapi=1&amp;";
-    	System.out.println(url);
-    	System.out.println(courseId+" courseId");
-    	Date date = new Date();
-    	int position = 1;
-    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
-    	if(course==null){
-    		course = Course.getCourseById(courseId);    		
-    		Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
-    	}
-    	Video video = new Video(course, topic, position, name, date, url);
-    	video.save();
-    	if(videoId!=0){
-    		videoLesson(courseId, videoId);
-    	}else{
-    		lesson(courseId);
-    	}    	
-    }   
-    public static void addLesson(long lessonId, String topic, long courseId, String name, String url, 
-    		File file) {
-    	Date date = new Date();
-    	int position = 1;
-    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
-    	if(course==null){
-    		course = Course.getCourseById(courseId);    		
-    		Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
-    	}
-    	Lesson lesson = new Lesson(course, topic, position, name, date);
-    	lesson.save();
-    	Files files =  new Files(date, file, lesson);
-    	files.save();
-    	lesson(courseId);
-//    	if(videoId!=0){
-//    		videoLesson(courseId, videoId);
-//    	}else{
-//    		lesson(courseId);
-//    	}    	
-    }   
-    public static void removeVideo(long courseId, String videoUrl) {
-    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
-    	if(course==null){
-    		course = Course.getCourseById(courseId);    		
-    		Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
-    	}
-//    	Video video = Video.getBy
-    	ArrayList<Video> videos = (ArrayList<Video>) Video.getMyOwnVideos(course);
-		if(videos.size()>0){
-			videoUrl = videos.get(0).getUrl();
-		}    
-    	render(course,videos,videoUrl);
-    }
+   
     public static void courseInfo(long courseId){
     	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
     	if(course==null){
@@ -343,8 +310,13 @@ public class MyOwnCourse extends Controller{
     	for(int i=0;i<assignments.size();i++){
     		topics.add(assignments.get(i).topic);    		
     	}
-    	System.out.println(topics.size());
-    	render(course,assignments,topics);
+    	List<Homework> homeworks= Homework.getCourseHomeworks(course);
+    	Set<String> homeworkTopics = new HashSet<String>();
+    	for(int i=0;i<homeworks.size();i++){
+    		homeworkTopics.add(homeworks.get(i).topic);    		
+    	}
+    	System.out.println(homeworkTopics.size());
+    	render(course,assignments,topics,homeworks,homeworkTopics);
     }
     public static void addAssignment(long courseId,String title, String topic,int attempts,String due_date){
     	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
@@ -429,7 +401,15 @@ public class MyOwnCourse extends Controller{
     }
     
     public static void checkAssignment(Long courseId,Long assignmentId,Long answer[]){  
-    	System.out.println();
+    	System.out.println(courseId);
+    	System.out.println(assignmentId);
+    	if(answer!=null){
+    		for(int i=0;i<answer.length;i++){
+        		System.out.print(answer[i]+ " ");
+        	}
+    	}
+    	
+
     	Date dateOfAttempt = new Date();
     	User user = Cache.get(session.getId() + "-user",User.class);
     	Assignment assignment = Assignment.findById(assignmentId);
@@ -486,7 +466,198 @@ public class MyOwnCourse extends Controller{
 //    	    	assignment(courseId,assignmentId);
 //    	assignmentFeedback(courseId, assignmentId,userAssignment);
     }
-    
+    public static void editor(long id) {
+    	System.out.println(id);
+//       //final User user = User.findById(id);
+  	    UserHomework file = UserHomework.findById(id);
+  	  System.out.println(file);
+//  	   notFoundIfNull(file);
+//  	   response.setContentTypeIfNotSet(file.file.type());
+//  	   renderBinary(file.file.get(), file.fileName);
+// 	
+//  	   
+//    	User user = (User)renderArgs.get("user");
+  	    System.out.println(file.file);
+	  	InputStream in = file.file.get();
+	  	System.out.println(file.fileName);
+	  	String ext = "";
+	  	if(file.fileName.contains(".")){
+	  		int s = file.fileName.lastIndexOf('.');
+	  		if(s+1<file.fileName.length()){
+	  			ext = file.fileName.substring(s+1, file.fileName.length());
+	  		}	  		
+	  	}
+	  	System.out.println(ext);
+	  	if(!ext.equals("js")&&!ext.equals("java")){
+	  		ext = "";
+	  	}
+	  	String out = "";
+	  	try {
+			out = IOUtils.toString(in, "UTF-8");
+			
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	  	String out1 = out.substring(0,out.length()-1);
+	  	render(out1,ext);
+    }
+    public static void createChecker(long courseId,long homeworkId){
+    	Course course = Course.getCourseById(courseId);
+    	Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");	
+    	Homework  homework = Homework.findById(homeworkId);
+    	render(course,homework);
+    }
+    public static void addChecker(long courseId,long homeworkId,String input, String output){
+    	Course course = Course.getCourseById(courseId);
+    	Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");	
+    	Homework  homework = Homework.findById(homeworkId);
+    	String lang = "java";
+    	Checker checker = new Checker(homework, input, output, lang);
+    	checker.save();
+    	homework(courseId, homeworkId);
+    }
+    public static void createHomework(long courseId,long homeworkId){
+    	Course course = Course.getCourseById(courseId);
+    	Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
+    	
+    	if(homeworkId!=0){
+    		Homework homework = Homework.findById(homeworkId);
+    		System.out.println(homework.files.size());
+    		render(course,homework);
+    	}else{
+    		render(course);
+    	}
+    }
+	public static void addHomework(long homeworkId,long courseId,String title, String topic,
+    		int attempts,String due_date,String text, File file){
+    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
+    	if(course==null){
+    		course = Course.getCourseById(courseId);    		
+    		Cache.set(session.getId() + "_user-course_" + courseId, course,"30mn");
+    	}    	
+    	int position = 0;
+    	System.out.println(due_date);
+    	SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy"); 
+    	Date convertedDueDate = null;
+		try {
+			convertedDueDate = dateFormat.parse(due_date);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Date hard_deadline = convertedDueDate;
+		System.out.println(hard_deadline);
+		System.out.println(homeworkId+"homeworkId");
+    	if(homeworkId!=0){
+    		Homework homework = Homework.findById(homeworkId);
+    		homework.title = title;
+    		homework.topic = topic;
+    		homework.attempts = attempts;
+    		homework.due_date = hard_deadline;
+    		homework.text = text;
+    		if(file!=null){
+        		System.out.println(file.getName());
+            	Files files =  new Files(hard_deadline, file, homework);
+            	files.save();
+            }
+    		Calendar calendar = new Calendar(course, hard_deadline, "Homework");
+    		calendar.save();
+        	homework.save();
+        }else{
+        	Homework homework = new Homework(course, topic, title, hard_deadline, hard_deadline,
+    				position, attempts, text);		
+        	homework.save();
+        	Calendar calendar = new Calendar(course, hard_deadline, "Homework");
+    		calendar.save();
+        	System.out.println(file+"1111111111111111111file");
+        	if(file!=null){
+        		System.out.println(file.getName());
+            	Files files =  new Files(hard_deadline, file, homework);
+            	files.save();
+            }
+        }
+		assignments(courseId);
+    }
+    public static void homework(long courseId,long homeworkId){
+    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
+    	if(course==null){
+    		course = Course.getCourseById(courseId);    		
+    		Cache.set(session.getId() + "_user-course_" + courseId, course,"30mn");
+    	}    	
+    	Homework homework = Homework.findById(homeworkId);
+    	List <Comment> comments = Comment.getHomeworkComments(homework);
+    	User user = (User)renderArgs.get("user");
+    	if(user.email.equals(session.get("email"))){
+    		List<UserHomework> userHomeworks = UserHomework.getUserHomeworks(homework);
+    		render(course,homework,comments,userHomeworks);
+    	}
+//    	List<AssignmentQuestion> questions = AssignmentQuestion.getAssignmentQuestions(assignment);
+//    	System.out.println(questions.size());
+//    	for(int i=0;i<questions.size();i++){
+//    		System.out.println(questions.get(i).answers.size());
+//    	}
+//    	List<AssignmentAnswer> answers = AssignmentAnswer.getAssignmentQuestionAnswers(question);
+    	render(course,homework,comments);
+    }
+	public static void deleteHomeworkFile(long courseId, long homeworkId,long id) {
+		final Files file = Files.findById(id);
+		file.delete();
+		homework(courseId,homeworkId);
+	}
+    public static void addHomeworkComment(long courseId,long homeworkId, String text,long parent){
+    	System.out.println(parent);
+    	
+    	Date date = new Date();
+    	User user = (User)renderArgs.get("user");
+    	Homework homework = Homework.findById(homeworkId);
+    	Comment comment = null;
+    	if(parent!=0){
+    		Comment commentParent = Comment.findById(parent);
+        	comment = new Comment(homework, user, text, date, commentParent);
+        }else{
+        	comment = new Comment(homework, user, text, date);
+    	}
+    	comment.save();
+    	homework(courseId, homeworkId);
+    }
+    public static void addUserHomework(long courseId,long homeworkId,File file){
+    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
+    	if(course==null){
+    		course = Course.getCourseById(courseId);    		
+    		Cache.set(session.getId() + "_user-course_" + courseId, course,"30mn");
+    	}    	
+    	
+    	//SimpleDateFormat dateFormat = new SimpleDateFormat("dd-mm-yyyy"); 
+    	User user = (User)renderArgs.get("user");
+    	Homework homework = Homework.findById(homeworkId);
+    	Date date = new Date();
+		UserHomework userHomework = new UserHomework(homework, user, date, 0, false,file);
+		userHomework.save();
+        
+		assignments(courseId);
+    }
+    public static void editUserHomework(long courseId,long homeworkId, long userHomeworkId,int score,boolean pass){
+    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
+    	if(course==null){
+    		course = Course.getCourseById(courseId);    		
+    		Cache.set(session.getId() + "_user-course_" + courseId, course,"30mn");
+    	}    	
+    	
+    	//SimpleDateFormat dateFormat = new SimpleDateFormat("dd-mm-yyyy"); 
+    	User user = (User)renderArgs.get("user");
+    	UserHomework userHomework = UserHomework.findById(userHomeworkId);
+    	userHomework.pass = pass;
+    	userHomework.score = score;
+    	userHomework.save();
+        
+    	homework(courseId,homeworkId);
+    }
+    public static void deleteUserHomeworkFile(long courseId, long homeworkId,long id) {
+    	UserHomework userHomework = UserHomework.findById(id);
+    	userHomework.delete();
+		homework(courseId,homeworkId);
+	}
     public static void discussion(long courseId,String search,int page){
     	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
     	if(course==null){
@@ -598,6 +769,7 @@ public class MyOwnCourse extends Controller{
     }
     public static void deleteAnswer(long courseId,long questionId,long answerId){
     	Answer answer = Answer.findById(answerId);
+    	answer.question.answers_number = answer.question.answers_number-1;    	
     	answer.delete();    	
     	question(courseId,questionId);
     }
@@ -647,7 +819,8 @@ public class MyOwnCourse extends Controller{
     		course = Course.getCourseById(courseId);    		
     		Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
     	}
-    	render(course);
+    	List<Calendar> datas = Calendar.getCalendarByCourse(course);
+    	render(course,datas);
     }
     public static void lesson(long courseId){
 //    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
@@ -670,15 +843,43 @@ public class MyOwnCourse extends Controller{
     	Lesson lesson = Lesson.findById(lessonId);
     	render(course,lesson);
     }
-    public static void editLesson(long courseId,long lessonId){
+    public static void editLesson(long lessonId, String topic, long courseId, String name,File file){
+    	Date date = new Date();
+    	int position = 1;
+    	Course course = Course.getCourseById(courseId);
+    	Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
+    	Lesson lesson = Lesson.findById(lessonId);
+    	lesson.topic = topic;
+    	lesson.name = name;
+    	System.out.println(file);
+    	if(file!=null){
+    		Files files =  new Files(date, file, lesson);
+        	files.save();
+        }
+    	lesson.save();
+    	textLesson(courseId,lessonId);
+    }
+    public static void createLesson(long courseId,long lessonId){
+    	
     	Course course = Course.getCourseById(courseId);
     	Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
     	render(course);
     }
-    public static void createLesson(long courseId){
-    	Course course = Course.getCourseById(courseId);
-    	Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
-    	render(course);
+    public static void addLessonComment(long courseId,long lessonId, String text,long parent){
+    	System.out.println(parent);
+    	
+    	Date date = new Date();
+    	User user = (User)renderArgs.get("user");
+    	Lesson lesson = Lesson.findById(lessonId);
+    	Comment comment = null;
+    	if(parent!=0){
+    		Comment commentParent = Comment.findById(parent);
+        	comment = new Comment(lesson, user, text, date, commentParent);
+        }else{
+        	comment = new Comment(lesson, user, text, date);
+    	}
+    	comment.save();
+    	textLesson(courseId, lessonId);
     }
     public static void videoLesson(long courseId,long videoId){
 //    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
@@ -691,12 +892,66 @@ public class MyOwnCourse extends Controller{
     	Video video = Video.findById(videoId);    	
     	render(course,video);
     }
-    public static void downloadLessonFile(long id) {
+    public static void addVideo(long videoId, String topic, long courseId, String name, String url) {
+    	System.out.println(videoId+"       111111111111111111111");
+    	System.out.println(url.indexOf("watch"));
+    	if(url.contains("watch")){
+    		url = url.substring(0,url.indexOf("watch"))+"embed/"+url.substring(url.indexOf("=")+1);
+    	}
+    	url+="?autoplay=0&amp;color=red&amp;html5=1&amp;rel=0&amp;showinfo=0&amp;theme=light&amp;wmode=opaque&amp;enablejsapi=1&amp;";
+    	System.out.println(url);
+    	System.out.println(courseId+" courseId");
+    	Date date = new Date();
+    	int position = 1;
+    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
+    	if(course==null){
+    		course = Course.getCourseById(courseId);    		
+    		Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
+    	}
+    	Video video = new Video(course, topic, position, name, date, url);
+    	video.save();
+    	if(videoId!=0){
+    		videoLesson(courseId, videoId);
+    	}else{
+    		lesson(courseId);
+    	}    	
+    }   
+    public static void removeVideo(long courseId, long videoId) {
+    	Video video  = Video.findById(videoId);
+		video.delete();
+		lesson(courseId);
+    }
+    public static void addLesson(long lessonId, String topic, long courseId, String name, String url, 
+    		File file) {
+    	Date date = new Date();
+    	int position = 1;
+    	Course course = Cache.get(session.getId() + "_user-course_"+courseId,Course.class);    	
+    	if(course==null){
+    		course = Course.getCourseById(courseId);    		
+    		Cache.set(session.getId() + "_user-course_"+courseId, course,"30mn");
+    	}
+    	Lesson lesson = new Lesson(course, topic, position, name, date);
+    	lesson.save();
+    	Files files =  new Files(date, file, lesson);
+    	files.save();
+    	lesson(courseId);
+//    	if(videoId!=0){
+//    		videoLesson(courseId, videoId);
+//    	}else{
+//    		lesson(courseId);
+//    	}    	
+    }   
+   
+    public static void downloadFile(long id) {
  	   //final User user = User.findById(id);
  	   final Files file = Files.findById(id);
  	   notFoundIfNull(file);
  	   response.setContentTypeIfNotSet(file.file.type());
  	   renderBinary(file.file.get(), file.fileName);
 	}
-    
+	public static void deleteLessonFile(long courseId, long lessonId,long id) {
+		final Files file = Files.findById(id);
+		file.delete();
+		textLesson(courseId,lessonId);
+	}
 }

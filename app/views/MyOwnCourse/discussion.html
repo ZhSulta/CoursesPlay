@@ -86,7 +86,7 @@ border-top: 0;
 				        </h4>
 				        <div class="userinfo">
 				            <img src="@{Application.userPhoto(q.user.id)}" width="32" height="32">				      								    
-				            <span class="relativetime" title="${q.publish_date.format('dd MMM hh:mm:ss')}">${q.publish_date.format('dd MMM hh:mm:ss')}</span>
+				            <span class="relativetime" title="${q.publish_date.format('dd MMM HH:mm:ss')}">${q.publish_date.format('dd MMM hh:mm:ss')}</span>
 				            <a href="#">
 				            	#{if q.user.username && q.user.username.length()>0}
 				            		${q.user.username}
@@ -136,7 +136,7 @@ border-top: 0;
 					      		<textarea name="text" style="width: 500px; height: 50px;"></textarea>
 					   		</div>
 					  	</div>						  	
-						<input type="hidden" name="courseId" value="&{course.id}">            		                 						   				
+						<input type="hidden" name="courseId" value="${course.id}">            		                 						   				
 					</div>
 			        	<div class="modal-footer">
 			           	<button class="btn" data-dismiss="modal">Close</button>

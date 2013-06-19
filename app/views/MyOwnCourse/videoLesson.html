@@ -20,7 +20,7 @@
 				<iframe width="560" height="420" src="${video.url}" frameborder="0" allowfullscreen="tru"></iframe>
 				</br>		          		
 				#{if course.user.email == session.email}	
-				<a href="@{MyOwnCourse.removeVideo(courseId,video.id)}">
+				<a href="@{MyOwnCourse.removeVideo(course.id,video.id)}">
        				Remove this video.
        			</a>
        			#{/if}

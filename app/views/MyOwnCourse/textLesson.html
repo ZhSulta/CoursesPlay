@@ -12,13 +12,95 @@
 	#{leftMenu course:course, isActive:'3' /}
 		<div class="span8">
 			<div class="b-box">
-			<div class="b-box__header"><h3>Lessons</h3></div>
+			<div class="b-box__header"><h3>Lesson</h3></div>
 			<div class="b-box__content">
 				<h2>${lesson?.name}</h2>
 				<p>${lesson?.topic}</p>		
-				<a href="@{MyOwnCourse.downloadLessonFile(lesson.id)}">${lesson.fileName}</a>
+				#{list items:lesson.files, as:'f'}
+					<p>
+						<span><a href="@{MyOwnCourse.downloadFile(f.id)}">${f.fileName}</a></span>
+						<span><a href="@{MyOwnCourse.deleteLessonFile(course.id, lesson.id, f.id)}">delete</a></span>
+					</p>
+				#{/list}
 			</div>
 			</div>	
+			<div class="b-box" id="discussion">
+            <div class="b-box__header"><h3>Discussion</h3></div>
+	            <div class="b-box__content">
+					<div class="b-discussion-container b-discussion-container_not-empty" discussionid="1585">
+						<ul class="b-discussion unstyled">
+							#{list items:lesson.comments, as:'c'}
+							#{if !c.parent?.id}
+							<li class="b-discussion-comment" id="comment_${c.id}">
+								<div style="margin-bottom:6px">
+									<img class=" b-discussion-comment__userpic b-user__profile-pic_45" 
+									src="@{Application.userPhoto(c.user.id)}" width="45" height="45">				      								    
+				            		<div class="b-discussion-comment__header">
+										<a href="" data-user="3299" data-json="" data-path="/ajax/user/getUserInfo" class="b-discussion-comment__header__username" data-original-title="Sultan ">Sultan </a>
+										<small style="margin-left: 5px;"><a href="#comment_14708" class="anchor" title="Permalink to this comment">14 minutes ago</a></small>
+										<a href="#" class="b-discussion-comment__header__delete" commentid="14708" style="display: none;">✕</a>        
+									</div>
+									<p class="b-discussion-comment__text">${c.text}</p>        
+									<div class="b-discussion-comment__footer">
+										<a href="#" class="b-discussion-comment__footer__reply" id="reply_${c.id}" style="display: none;">Reply</a>
+									</div>
+									<div id="childComment_${c.id}">
+										
+									</div>
+									<form action="@{MyOwnCourse.addLessonComment()}" class="b-discussion-reply-form" id="form_${c.id}">
+										<img class=" b-discussion-comment__userpic b-user__profile-pic_45" 
+										src="@{Application.userPhoto(c.user.id)}" width="45" height="45">				      								    
+				            			<div class="b-discussion-comment__header">
+											<a class="b-discussion-comment__header__username">
+												#{if session.username }
+									        	${session.username}
+										        #{/if}
+										        #{else}
+										        	${session.email}
+										        #{/else}   
+									        </a>
+										</div>
+										<textarea name="text" class="auto-resize" required="required" style="width: 100%; resize:none; box-sizing: border-box;"></textarea>
+										<div class="b-discussion-comment__footer">                    
+											<input type="hidden" name="parent" value="${c.id}">        
+											<input type="hidden" name="courseId" value="${course.id}" />
+		            						<input type="hidden" name="lessonId" value="${lesson.id}" />       
+					        				<button type="submit" class="btn btn-primary btn-mini" value="Send">Send</button>
+											<span style="margin-left: 10px">
+												<small><a href="#" class="anchor" id="cancel_${c.id}">cancel</a></small>
+											</span>
+										</div>
+									</form>   
+								</div>
+							</li>
+							#{/if}
+							#{/list}
+						</ul>    
+					</div>	           
+	                <div class="b-discussion-global-reply-container">
+	        			<form action="@{MyOwnCourse.addLessonComment()}" class=" b-discussion-reply-form_global">
+							<img class=" b-discussion-comment__userpic b-user__profile-pic_45" 
+							src="@{Application.userPhoto(user.id)}" width="45" height="45">				      								    
+				            <div class="b-discussion-comment__header">
+						        <a class="b-discussion-comment__header__username">
+							 		#{if session.username }
+							        	${session.username}
+							        #{/if}
+							        #{else}
+							        	${session.email}
+							        #{/else}       
+						        </a>
+						    </div>
+							<textarea name="text" class="auto-resize" required="required" style="width: 100%; resize:none; box-sizing: border-box;"></textarea>
+							<div class="b-discussion-comment__footer">
+		                    	<input type="hidden" name="courseId" value="${course.id}" />
+		            			<input type="hidden" name="lessonId" value="${lesson.id}" />        
+		        				<button type="submit" class="btn btn-primary btn-mini" value="Send">Send</button>
+	            			</div>
+						</form>
+	    			</div>
+	            </div>
+        	</div>
 		</div>
 		<div class="span3">
 		#{if course.user.email == session.email}
@@ -49,7 +131,7 @@
         	<a class="close" data-dismiss="modal">×</a>
          	<h3 id="myModalLabel">Edit Lesson</h3>
          </div>
-         <form action="@{MyOwnCourse.editLesson()}" class="form-horizontal">
+         <form action="@{MyOwnCourse.editLesson()}" method="post" class="form-horizontal" enctype="multipart/form-data">
       	 <div class="modal-body">                 	
          	<div class="control-group">
 		    	<label class="control-label" for="topic">Topic</label>
@@ -60,7 +142,7 @@
 		  	<div class="control-group">
 		    	<label class="control-label" for="inputName">Name</label>
 		    	<div class="controls">
-		      		<input type="text" id="inputName" value="${lesson?.name}"  name="name" placeholder="Write name of video">
+		      		<input type="text" id="inputName" value="${lesson?.name}"  name="name" placeholder="Write name of lesson">
 		   		</div>
 		  	</div>
 		    <div class="control-group">
@@ -74,9 +156,35 @@
 		 </div>
          <div class="modal-footer">
          	<button class="btn" data-dismiss="modal">Close</button>
-         	<button type="submit" class="btn btn-primary">Add Video</button>
+         	<button type="submit" class="btn btn-primary">Edit lesson</button>
          </div>	    	
         </form>
     </div>
 
     #{/if}  
+#{set 'moreScripts'}    
+<script type="text/javascript">
+	console.log(${lesson.comments.id});
+	$(${lesson.comments.id}).each(function(i){
+		var comment = ${lesson.comments.id}[i];
+		var child = ${lesson.comments.parent.id}[i];
+        //console.log(comment);
+        if(child){
+            //console.log(comment);
+            //$('#childComment_'+comment).show();
+        	$('#childComment_'+child).append('<div>1</div>');
+        }
+    	$("#comment_"+comment).hover(function(){
+    		$('#reply_'+comment).show();
+    	},function(){
+    	    $('#reply_'+comment).hide();
+    	});
+    	$("#reply_"+comment).on('click', function(){
+    		$("#form_"+comment).slideToggle("slow");
+    	});
+    	$("#cancel_"+comment).on('click', function(){
+    		$("#form_"+comment).slideToggle("slow");
+    	});
+    });
+</script>
+#{/set}  

@@ -66,74 +66,87 @@ background: url("/public/images/icon/_sprt_commons.png") no-repeat -80px -100px;
 			    	#{else}
 			    		<li>
 			    	#{/else}
-	                	<a class="b-menu-element" href="@{MyOwnCourse.courseInfo(_course.id)}" title="">
+	                	<a class="b-menu-element" href="@{MyOwnCourse.courseInfo(_course?.id)}" title="">
 	                		<center>
 	                			<div class="b-menu-element__icon b-menu-element__icon-News"></div>
 	                			<small>News</small>
 	                		</center>
 						</a>
 	                </li>
-					#{if _isActive=='2'}
-			    		<li class="active">
-			    	#{/if}
-			    	#{else}
-			    		<li>
-			    	#{/else}
-	                	<a class="b-menu-element" href="@{MyOwnCourse.calendar(_course.id)}" title="">
-	                		<center>
-	                			<div class="b-menu-element__icon b-menu-element__icon-Timetable"></div>
-	                			<small>Timetable</small>
-	                		</center>
-						</a>
-	                </li>
-	    	    	#{if _isActive=='3'}
-			    		<li class="active">
-			    	#{/if}
-			    	#{else}
-			    		<li>
-			    	#{/else}
-	                	<a class="b-menu-element" href="@{MyOwnCourse.lesson(_course.id)}" title="">
-	                		<center>
-	                			<div class="b-menu-element__icon b-menu-element__icon-Lessons"></div>
-	                			<small>Lessons</small>
-	                		</center>
-						</a>
-	                </li>
-	    	    	#{if _isActive=='4'}
-			    		<li class="active">
-			    	#{/if}
-			    	#{else}
-			    		<li>
-			    	#{/else}
-	                	<a class="b-menu-element" href="@{MyOwnCourse.assignments(_course.id)}" title="">
-	                		<center>
-	                			<div class="b-menu-element__icon b-menu-element__icon-Assignments"></div>
-	                			<small>Assignments</small>
-	                		</center>
-						</a>
-	                </li>
-	    	    	#{if _isActive=='5'}
-			    		<li class="active">
-			    	#{/if}
-			    	#{else}
-			    		<li>
-			    	#{/else}
-	                	<a class="b-menu-element" href="@{MyOwnCourse.discussion(_course.id)}" title="">
-	                		<center>
-	                			<div class="b-menu-element__icon b-menu-element__icon-Discussions"></div>
-	                			<small>Discussions</small>
-	                		</center>
-	                		<span class="b-notification-number-container_tab"><span class="b-notification-number"><span class="b-notification-number__bg"><span class="b-notification-number__nbr">1</span></span><span class="b-notification-number__bgl"></span><span class="b-notification-number__bgr"></span></span></span>	                	
-						</a>
-	                </li>
-	    	    	#{if _course.user.email == session.email}
+	                #{if _course.isTimeTable}
+	                	#{if _isActive=='2'}
+				    		<li class="active">
+				    	#{/if}
+				    	#{else}
+				    		<li>
+				    	#{/else}
+		                	<a class="b-menu-element" href="@{MyOwnCourse.calendar(_course?.id)}" title="">
+		                		<center>
+		                			<div class="b-menu-element__icon b-menu-element__icon-Timetable"></div>
+		                			<small>Timetable</small>
+		                		</center>
+							</a>
+		                </li>
+	                #{/if}
+					
+	                #{if _course.isLessons}
+	                	#{if _isActive=='3'}
+				    		<li class="active">
+				    	#{/if}
+				    	#{else}
+				    		<li>
+				    	#{/else}
+		                	<a class="b-menu-element" href="@{MyOwnCourse.lesson(_course?.id)}" title="">
+		                		<center>
+		                			<div class="b-menu-element__icon b-menu-element__icon-Lessons"></div>
+		                			<small>Lessons</small>
+		                		</center>
+							</a>
+		                </li>
+	                #{/if}
+	    	    	#{if _course.isAssignments}
+		    	    	#{if _isActive=='4'}
+				    		<li class="active">
+				    	#{/if}
+				    	#{else}
+				    		<li>
+				    	#{/else}
+		                	<a class="b-menu-element" href="@{MyOwnCourse.assignments(_course?.id)}" title="">
+		                		<center>
+		                			<div class="b-menu-element__icon b-menu-element__icon-Assignments"></div>
+		                			<small>Assignments</small>
+		                		</center>
+							</a>
+		                </li>
+	    	    	#{/if}
+	    	    	
+	    	    	#{if _course.isDiscussions}
+	    	    		#{if _isActive=='5'}
+				    		<li class="active">
+				    	#{/if}
+				    	#{else}
+				    		<li>
+				    	#{/else}
+			                	<a class="b-menu-element" href="@{MyOwnCourse.discussion(_course?.id)}" title="">
+			                		<center>
+			                			<div class="b-menu-element__icon b-menu-element__icon-Discussions"></div>
+			                			<small>Discussions</small>
+			                		</center>
+			                		<!-- 
+			                		<span class="b-notification-number-container_tab"><span class="b-notification-number"><span class="b-notification-number__bg"><span class="b-notification-number__nbr">1</span></span><span class="b-notification-number__bgl"></span><span class="b-notification-number__bgr"></span></span></span>	                	
+									 -->
+								</a>
+	                		</li>
+	    	    	#{/if}
+	    	    	
+	    	    	#{if _course?.user?.email == session.email}
 					#{if _isActive=='6'}
 			    		<li class="active">
 			    	#{/if}
 			    	#{else}
 			    		<li>
 			    	#{/else}
-	                	<a class="b-menu-element" href="@{MyOwnCourse.progress(_course.id)}" title="">
+	                	<a class="b-menu-element" href="@{MyOwnCourse.progress(_course?.id)}" title="">
 	                		<center>
 	                			<div class="b-menu-element__icon b-menu-element__icon-Reports"></div>
 	                			<small>Reports</small>
@@ -146,7 +159,7 @@ background: url("/public/images/icon/_sprt_commons.png") no-repeat -80px -100px;
 				    	#{else}
 				    		<li>
 				    	#{/else}
-		                	<a class="b-menu-element" href="@{MyOwnCourse.courseSettings(_course.id)}" title="">
+		                	<a class="b-menu-element" href="@{MyOwnCourse.courseSettings(_course?.id)}" title="">
 		                		<center>
 		                			<div class="b-menu-element__icon b-menu-element__icon-Settings"></div>
 		                			<small>Settings</small>

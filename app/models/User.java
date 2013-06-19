@@ -53,6 +53,8 @@ public class User extends Model implements Serializable{
 	public Set<Comment> comments;
 	@OneToMany(mappedBy="user", cascade=CascadeType.ALL)
 	public Set<UserAssignment> userAssignments;
+	@OneToMany(mappedBy="user", cascade=CascadeType.ALL)
+	public Set<UserHomework> userHomeworks;
 	
 	public User(String username, String pwd, String email, String firstName,
 			String lastName, String gender, String location, Blob avatar,
@@ -67,7 +69,7 @@ public class User extends Model implements Serializable{
 		this.avatar = avatar;
 		this.birthday = birthday;
 		this.aboutMe = aboutMe;
-		this.isActive = false;;
+		this.isActive = false;
 	}
 
 	public User(String email, String pwd,Blob avatar) {

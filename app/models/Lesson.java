@@ -25,6 +25,8 @@ public class Lesson extends Model{
 	public Date date;
 	@OneToMany(mappedBy="lesson", cascade=CascadeType.ALL, fetch = FetchType.EAGER)
 	public Set<Files> files;
+	@OneToMany(mappedBy="lesson", cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	public Set<Comment> comments;
 	
 	public Lesson(Course course, String topic, int position, String name,
 			Date date) {
@@ -34,6 +36,7 @@ public class Lesson extends Model{
 		this.name = name;
 		this.date = date;
 		this.files = new HashSet<Files>();
+		this.comments = new HashSet<Comment>();
 	}	
 	public static List<Lesson> getCourseLesson(Course course){
 		 return Lesson.find("byCourse", course).fetch();		 

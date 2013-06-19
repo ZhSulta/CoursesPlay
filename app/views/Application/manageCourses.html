@@ -103,8 +103,8 @@
 							    	<a href="@{MyOwnCourse.deactivateCourse(i.id)}">Deactivate</a>							    	
 						      	</td>
 						      	<td>
-							    	<a href="@{MyOwnCourse.sendMessageToCourseOwner(i.id)}">Send</a>  	
-						      	</td>
+						      		<a href="@{MyOwnCourse.sendMessageToCourseOwner(i.id,i.user.email,i.user.username)}">Send</a>
+							    </td>
 					    	</tr>
 					    	#{/list}
 					  	</tbody>
@@ -147,13 +147,12 @@
 							    	<a href="@{MyOwnCourse.activateCourse(i.id)}">Activate</a>							    	
 						      	</td>
 						      	<td>						      	
-							    	<a href="@{MyOwnCourse.sendMessageToCourseOwner(i.id)}">Send</a>  	
+							    	 <a href="@{MyOwnCourse.sendMessageToCourseOwner(i.id,i.user.email,i.user.username)}">Send</a>
 						      	</td>
 					    	</tr>
 					    	#{/list}
 					  	</tbody>
 					</table>
-					<a href="#">Delete selected</a>
 			    </div>
 			</div>
 		</div>
